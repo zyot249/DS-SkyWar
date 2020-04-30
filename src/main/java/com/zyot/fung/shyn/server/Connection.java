@@ -1,6 +1,5 @@
 package com.zyot.fung.shyn.server;
 
-import com.zyot.fung.shyn.packet.AddConnectionResponsePacket;
 import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
 
 import java.io.EOFException;
@@ -59,11 +58,13 @@ public class Connection implements Runnable {
 
     public void close() {
         try {
-            for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-                Connection c = entry.getValue();
-                if (c != this) {
-                    RemoveConnectionPacket removeConnectionPacket = new RemoveConnectionPacket(this.id, this.playerName);
-                    c.sendObject(removeConnectionPacket);
+            if (this.playerName != null) {
+                for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                    Connection c = entry.getValue();
+                    if (c.id != this.id) {
+                        RemoveConnectionPacket removeConnectionPacket = new RemoveConnectionPacket(this.id, this.playerName);
+                        c.sendObject(removeConnectionPacket);
+                    }
                 }
             }
             running = false;

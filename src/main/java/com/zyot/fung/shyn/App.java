@@ -1,8 +1,8 @@
 package com.zyot.fung.shyn;
 
 import com.zyot.fung.shyn.client.Client;
-import com.zyot.fung.shyn.packet.AddConnectionPacket;
-import com.zyot.fung.shyn.server.Server;
+import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
+import com.zyot.fung.shyn.server.Room;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -28,7 +28,7 @@ public class App {
                     break;
                 }
                 case 2: {
-                    joinGame();
+                    joinGame(false);
                     break;
                 }
                 case 3: {
@@ -45,7 +45,7 @@ public class App {
         }
     }
 
-    private static void joinGame() {
+    private static void joinGame(boolean isMaster) {
         Scanner scanner = new Scanner(System.in);
         String playerName = enterPlayerName(scanner);
         Client client = new Client("localhost", HOST_PORT);
@@ -53,8 +53,8 @@ public class App {
         client.connect();
 
         try {
-            AddConnectionPacket addConnectionPacket = new AddConnectionPacket(playerName);
-            client.sendObject(addConnectionPacket);
+            AddConnectionRequestPacket addConnectionRequestPacket = new AddConnectionRequestPacket(playerName, isMaster);
+            client.sendObject(addConnectionRequestPacket);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,10 +89,10 @@ public class App {
     }
 
     private static void createNewGame() {
-        Server server = new Server(HOST_PORT);
-        server.start();
+        Room room = new Room(HOST_PORT);
+        room.start();
 
-        joinGame();
+        joinGame(true);
     }
 
     private static void printMenu() {
