@@ -2,7 +2,9 @@ package com.zyot.fung.shyn.server.packet.request;
 
 import java.io.Serializable;
 
-public class JoinRoomRequest implements Serializable{
+import com.zyot.fung.shyn.server.packet.Request;
+
+public class JoinRoomRequest extends Request implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public int id;
