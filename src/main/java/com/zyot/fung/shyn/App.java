@@ -1,6 +1,7 @@
 package com.zyot.fung.shyn;
 
 import com.zyot.fung.shyn.client.Client;
+import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
 import com.zyot.fung.shyn.server.Room;
 
@@ -48,13 +49,13 @@ public class App {
     private static void joinGame(boolean isMaster) {
         Scanner scanner = new Scanner(System.in);
         String playerName = enterPlayerName(scanner);
-        Client client = new Client("localhost", HOST_PORT);
-        client.playerName = playerName;
-        client.connect();
+        Player player = new Player("localhost", HOST_PORT);
+        player.playerName = playerName;
+        player.connect();
 
         try {
             AddConnectionRequestPacket addConnectionRequestPacket = new AddConnectionRequestPacket(playerName, isMaster);
-            client.sendObject(addConnectionRequestPacket);
+            player.sendObject(addConnectionRequestPacket);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,8 +63,12 @@ public class App {
         while (true) {
             String command = scanner.nextLine();
             if (command.equals("exit")) {
-                client.close();
+                player.close();
                 break;
+            } else if (command.equals("ready")) {
+                player.notifyReadyState(true);
+            } else if (command.equals("unready")) {
+                player.notifyReadyState(false);
             }
         }
     }

@@ -1,9 +1,6 @@
 package com.zyot.fung.shyn.server;
 
-import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
-import com.zyot.fung.shyn.packet.AddConnectionResponsePacket;
-import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
-import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
+import com.zyot.fung.shyn.packet.*;
 
 import java.util.Map;
 
@@ -17,6 +14,23 @@ public class EventListener {
         } else if (p instanceof RemoveConnectionPacket) {
             RemoveConnectionPacket removeConnectionPacket = (RemoveConnectionPacket) p;
             handleRemoveConnectionPacket(removeConnectionPacket, connection);
+        } else if (p instanceof ReadyRequestPacket) {
+            ReadyRequestPacket readyRequestPacket = (ReadyRequestPacket) p;
+            handleReadyRequestPacket(readyRequestPacket, connection);
+        }
+    }
+
+    private void handleReadyRequestPacket(ReadyRequestPacket packet, Connection connection) {
+        if (connection.id == packet.id) {
+            Room.clients.forEach(clientInRoom -> {
+                if (clientInRoom.id == connection.id)
+                    clientInRoom.isReady = packet.isReady;
+            });
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+            for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                Connection c = entry.getValue();
+                c.sendObject(updateRoomInfoPacket);
+            }
         }
     }
 
@@ -63,10 +77,5 @@ public class EventListener {
     private void handleRemoveConnectionPacket(RemoveConnectionPacket packet, Connection connection) {
         System.out.println("Client: " + packet.id + " with name " + packet.playerName + " has disconnected");
         ConnectionHandler.connections.get(packet.id).close();
-//        for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-//            Connection c = entry.getValue();
-//            if (c.id != connection.id)
-//                c.sendObject(packet);
-//        }
     }
 }

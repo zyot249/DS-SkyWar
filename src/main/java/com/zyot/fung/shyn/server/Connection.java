@@ -1,6 +1,8 @@
 package com.zyot.fung.shyn.server;
 
+import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
+import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -59,11 +61,25 @@ public class Connection implements Runnable {
     public void close() {
         try {
             if (this.playerName != null) {
-                for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-                    Connection c = entry.getValue();
-                    if (c.id != this.id) {
-                        RemoveConnectionPacket removeConnectionPacket = new RemoveConnectionPacket(this.id, this.playerName);
-                        c.sendObject(removeConnectionPacket);
+                if (this.id == 0) {
+                    ClosedServerNotificationPacket closedServerNotificationPacket = new ClosedServerNotificationPacket("Room Master was out!");
+                    for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                        Connection c = entry.getValue();
+                        if (c.id != this.id) {
+                            c.sendObject(closedServerNotificationPacket);
+                        }
+                    }
+                } else {
+                    Room.clients.removeIf(clientInRoom -> clientInRoom.id == this.id);
+                    UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+
+                    for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                        Connection c = entry.getValue();
+                        if (c.id != this.id) {
+                            RemoveConnectionPacket removeConnectionPacket = new RemoveConnectionPacket(this.id, this.playerName);
+                            c.sendObject(removeConnectionPacket);
+                            c.sendObject(updateRoomInfoPacket);
+                        }
                     }
                 }
             }
@@ -79,6 +95,7 @@ public class Connection implements Runnable {
 
     public void sendObject(Object packet) {
         try {
+            out.reset();
             out.writeObject(packet);
             out.flush();
         } catch (IOException e) {

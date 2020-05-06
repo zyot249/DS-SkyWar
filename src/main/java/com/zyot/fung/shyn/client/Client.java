@@ -23,6 +23,7 @@ public class Client implements Runnable{
 
     private int id;
     public String playerName;
+
     private boolean isServerDied = false;
 
     public Client(String host, int port) {
