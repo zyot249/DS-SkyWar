@@ -17,7 +17,8 @@ public class Constants {
     public static final int PLAYER_HOLDER_HEIGHT = 300;
 
     public static final String HOME_SCREEN = "HomeScreen";
-    public static final String ROOM_SCREEN = "RoomScreen";
+    public static final String NEW_ROOM_SCREEN = "NewRoomScreen";
+    public static final String EXISTED_ROOM_SCREEN = "ExistedRoomScreen";
 
     public static final String NORMAL_FONT = "Colonna MT";
 }

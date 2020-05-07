@@ -14,14 +14,18 @@ public class PlayerHolder extends JPanel {
         setSize(200, 300);
         setBorder(new LineBorder(Color.BLACK));
         setBounds(x, y, PLAYER_HOLDER_WIDTH, PLAYER_HOLDER_HEIGHT);
-        init();
+        initUI();
     }
 
-    private void init() {
-        playerNameLb = new JLabel("Player", SwingConstants.CENTER);
+    private void initUI() {
+        playerNameLb = new JLabel("No Player", SwingConstants.CENTER);
         playerNameLb.setBounds(20, 260, 160, 30);
         playerNameLb.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
 
         add(playerNameLb);
+    }
+
+    public JLabel getPlayerNameLb() {
+        return playerNameLb;
     }
 }

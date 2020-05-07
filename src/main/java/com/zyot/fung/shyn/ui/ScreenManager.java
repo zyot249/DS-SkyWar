@@ -37,12 +37,17 @@ public class ScreenManager {
     }
 
     public void navigate(String screenName) {
-        if (screenName.equals("HomeScreen")) {
+        if (screenName.equals(HOME_SCREEN)) {
             window.getContentPane().removeAll();
             window.getContentPane().add(getHomeScreen());
             window.revalidate();
             window.repaint();
-        } else if (screenName.equals("RoomScreen")) {
+        } else if (screenName.equals(NEW_ROOM_SCREEN)) {
+            window.getContentPane().removeAll();
+            window.getContentPane().add(getNewRoomScreen());
+            window.revalidate();
+            window.repaint();
+        } else if (screenName.equals(EXISTED_ROOM_SCREEN)) {
             window.getContentPane().removeAll();
             window.getContentPane().add(getRoomScreen());
             window.revalidate();
@@ -58,6 +63,13 @@ public class ScreenManager {
     }
 
     private synchronized RoomScreen getRoomScreen() {
+        if (roomScreen == null) {
+            roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+        return roomScreen;
+    }
+
+    private synchronized RoomScreen getNewRoomScreen() {
         roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
         return roomScreen;
     }

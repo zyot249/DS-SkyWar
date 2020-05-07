@@ -5,8 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static com.zyot.fung.shyn.common.Constants.NORMAL_FONT;
-import static com.zyot.fung.shyn.common.Constants.ROOM_SCREEN;
+import static com.zyot.fung.shyn.common.Constants.*;
 
 public class HomeScreen extends JPanel implements ActionListener{
 
@@ -20,11 +19,11 @@ public class HomeScreen extends JPanel implements ActionListener{
     public HomeScreen(int width, int height) {
         setSize(width, height);
         setLayout(null);
-        init();
+        initUI();
         setVisible(true);
     }
 
-    private void init() {
+    private void initUI() {
         createGameBtn = new JButton("Create Game");
         joinGameBtn = new JButton("Join Game");
         quitGameBtn = new JButton("Quit");
@@ -56,11 +55,28 @@ public class HomeScreen extends JPanel implements ActionListener{
         if (e.getSource() == quitGameBtn) {
             System.exit(0);
         } else if (e.getSource() == createGameBtn) {
-            if (screenManager == null)
-                screenManager = ScreenManager.getInstance();
-            screenManager.navigate(ROOM_SCREEN);
+            createNewGame();
         } else if (e.getSource() == joinGameBtn) {
             System.out.println(2);
+        }
+    }
+    private String enterPlayerName() {
+        String name = JOptionPane.showInputDialog(this, "Enter player name:", "Player Name", JOptionPane.QUESTION_MESSAGE);
+        return name;
+    }
+
+    private void createNewGame() {
+        String playerName = enterPlayerName();
+        if (playerName == null) {
+            JOptionPane.showMessageDialog(this, "Please enter a nickname before starting game!");
+        } else if (playerName.length() < 4) {
+            JOptionPane.showMessageDialog(this, "Your nickname is too short(must be longer than 4)!");
+        } else if (playerName.length() > 16) {
+            JOptionPane.showMessageDialog(this, "Your nickname is too long(must be shorter than 16!");
+        } else {
+            if (screenManager == null)
+                screenManager = ScreenManager.getInstance();
+            screenManager.navigate(NEW_ROOM_SCREEN);
         }
     }
 }
