@@ -53,7 +53,7 @@ public class Player implements KeyListener {
 
     public void render(Graphics g) {
         if (health > 0) {
-            g.drawImage(LoadImage.player, x, y, 30, 30, null);
+            g.drawImage(ImageLoader.player, x, y, 30, 30, null);
         }
     }
 

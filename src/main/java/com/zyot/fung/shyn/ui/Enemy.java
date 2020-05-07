@@ -16,7 +16,7 @@ public class Enemy {
     }
 
     public void render(Graphics g) {
-        g.drawImage(LoadImage.enemy, x, y, 25, 25, null);
+        g.drawImage(ImageLoader.enemy, x, y, 25, 25, null);
     }
 
     public int getX() {

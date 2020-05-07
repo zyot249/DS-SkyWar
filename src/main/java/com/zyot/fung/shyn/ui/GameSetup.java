@@ -3,6 +3,9 @@ package com.zyot.fung.shyn.ui;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 
+import static com.zyot.fung.shyn.common.Constants.GAME_HEIGHT;
+import static com.zyot.fung.shyn.common.Constants.GAME_WIDTH;
+
 public class GameSetup implements  Runnable {
     private String title;
     private int width;
@@ -10,8 +13,7 @@ public class GameSetup implements  Runnable {
     private Thread thread;
     private boolean running;
 
-    public static final int GAME_WIDTH = 400;
-    public static final int GAME_HEIGHT = 400;
+
 
     private Display display;
     private GameManager manager;
@@ -25,7 +27,7 @@ public class GameSetup implements  Runnable {
     }
 
     public void run() {
-        LoadImage.init();
+        ImageLoader.init();
         display = new Display(title, width, height);
         manager = new GameManager();
 
@@ -85,7 +87,7 @@ public class GameSetup implements  Runnable {
         g.clearRect(0,0,width, height);
 
         // draw
-        g.drawImage(LoadImage.image, 50 ,50, GAME_WIDTH, GAME_HEIGHT, null);
+        g.drawImage(ImageLoader.image, 50 ,50, GAME_WIDTH, GAME_HEIGHT, null);
         manager.render(g);
         // end of draw
 

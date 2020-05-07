@@ -4,6 +4,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static com.zyot.fung.shyn.common.Constants.GAME_HEIGHT;
+import static com.zyot.fung.shyn.common.Constants.GAME_WIDTH;
+
 public class GameManager {
     private Player player;
     public static ArrayList<Bullet> bullets;
@@ -16,7 +19,7 @@ public class GameManager {
     }
 
     public void init() {
-        player = new Player(GameSetup.GAME_WIDTH / 2 + 50, GameSetup.GAME_HEIGHT + 20);
+        player = new Player(GAME_WIDTH / 2 + 50, GAME_HEIGHT + 20);
         player.init();
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
