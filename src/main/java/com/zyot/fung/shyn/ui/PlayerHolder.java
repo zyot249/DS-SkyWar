@@ -19,7 +19,7 @@ public class PlayerHolder extends JPanel {
     }
 
     private void initUI() {
-        playerNameLb = new JLabel("No Player", SwingConstants.CENTER);
+        playerNameLb = new JLabel("No PlayerInGame", SwingConstants.CENTER);
         playerNameLb.setBounds(20, 260, 160, 30);
         playerNameLb.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
 

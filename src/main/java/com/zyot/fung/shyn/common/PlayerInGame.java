@@ -1,28 +1,37 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.common;
+
+import com.zyot.fung.shyn.server.GameManager;
+import com.zyot.fung.shyn.ui.LoadImage;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.io.Serializable;
 
-public class Player implements KeyListener {
+public class PlayerInGame implements Serializable {
+    private int position;
+    public int id;
     private int x;
     private int y;
-    private boolean fire;
-    private boolean right;
-    private boolean left;
+    public boolean fire;
+    public boolean right;
+    public boolean left;
 
     private long current;
     private long delay;
     private int health;
     private int score;
 
-    public Player(int x, int y) {
+    public PlayerInGame(int x, int y, int id, int position) {
+        this.id = id;
+        this.position = position;
         this.x = x;
         this.y = y;
     }
 
     public void init() {
-        Display.frame.addKeyListener(this);
+//        if (isMe()) {
+//            Display.frame.addKeyListener(this);
+//        }
+
         current = System.nanoTime();
         delay = 100;
         health = 3;
@@ -30,6 +39,24 @@ public class Player implements KeyListener {
     }
 
     public void tick() {
+/*        if (!isMe() && health > 0) {
+            Random rand =  new Random();
+            int movement = rand.nextInt(30); // 0-not moving , 1-left, 2-right
+            int firing = rand.nextInt(10);   // 0-fire , other- not fire
+
+            if (movement<10){
+                    this.left = false;
+                    this.right = false;
+            } else if (movement<20){
+                    this.left = true;
+                    this.right = false;
+            } else if (movement<30) {
+                    this.left = false;
+                    this.right = true;
+            }
+
+            this.fire = (firing==1);
+        }*/
         if (health > 0) {
             if (left) {
                 if (x >= 50) {
@@ -53,12 +80,19 @@ public class Player implements KeyListener {
 
     public void render(Graphics g) {
         if (health > 0) {
-            g.drawImage(ImageLoader.player, x, y, 30, 30, null);
+            if (isMe()) {
+                g.drawImage(LoadImage.myPlane, x, y, 30, 30, null);
+            } else {
+                g.drawImage(LoadImage.player, x, y, 30, 30, null);
+            }
         }
     }
 
+    private boolean isMe() {
+        return id == AppPreferences.UID;
+    }
 
-    @Override
+ /*   @Override
     public void keyTyped(KeyEvent e) {
 
     }
@@ -89,7 +123,7 @@ public class Player implements KeyListener {
         if (keycode == KeyEvent.VK_SPACE) {
             fire = false;
         }
-    }
+    }*/
 
     public int getX() {
         return this.x;
@@ -113,5 +147,9 @@ public class Player implements KeyListener {
 
     public void incScore() {
         this.score = this.score + 1;
+    }
+
+    public int getPosition() {
+        return position;
     }
 }

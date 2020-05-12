@@ -1,8 +1,9 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.common;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Bullet {
+public class Bullet implements Serializable {
     private int x;
     private int y;
     private int speed;

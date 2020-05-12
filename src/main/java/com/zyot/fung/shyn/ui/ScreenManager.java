@@ -1,6 +1,8 @@
 package com.zyot.fung.shyn.ui;
 
+import com.zyot.fung.shyn.common.Constants;
 import com.zyot.fung.shyn.ui.screens.HomeScreen;
+import com.zyot.fung.shyn.ui.screens.IngameScreen;
 import com.zyot.fung.shyn.ui.screens.RoomScreen;
 
 import javax.swing.*;
@@ -73,11 +75,20 @@ public class ScreenManager {
             window.getContentPane().add(getRoomScreen());
             window.revalidate();
             window.repaint();
+        } else if (screenName.equals(INGAME_SCREEN)) {
+            openNewScreen(getIngameScreen());
         }
     }
 
     public void navigate(String screenName) {
         navigate(screenName, null);
+    }
+
+    private void openNewScreen(JPanel screen) {
+        window.getContentPane().removeAll();
+        window.getContentPane().add(screen);
+        window.revalidate();
+        window.repaint();
     }
 
     private synchronized HomeScreen getHomeScreen() {
@@ -100,5 +111,13 @@ public class ScreenManager {
         args.put("isRoomMaster", isRoomMaster);
         roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, args);
         return roomScreen;
+    }
+
+    private synchronized JPanel getIngameScreen() {
+        return new IngameScreen(Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT, null);
+    }
+
+    public JFrame getWindow() {
+        return this.window;
     }
 }

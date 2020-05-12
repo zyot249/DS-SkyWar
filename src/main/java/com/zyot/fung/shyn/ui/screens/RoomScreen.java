@@ -3,6 +3,7 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
+import com.zyot.fung.shyn.common.Constants;
 import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
 import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
@@ -140,13 +141,14 @@ public class RoomScreen extends JPanel implements ActionListener {
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
-                holder.getPlayerNameLb().setText("No Player");
+                holder.getPlayerNameLb().setText("No PlayerInGame");
                 holder.setReadyIcon(false);
             }
         }
     }
 
     private void exitRoom() {
+        exitScreen();
         room.shutdown();
     }
 
@@ -158,7 +160,7 @@ public class RoomScreen extends JPanel implements ActionListener {
             exitRoom();
         if (player != null)
             player.close();
-        EventBuz.getInstance().unregister(this);
+        exitScreen();
     }
 
     @Override
@@ -166,9 +168,14 @@ public class RoomScreen extends JPanel implements ActionListener {
         if (e.getSource() == exitBtn) {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
-
+            player.sendStartGameRequest(1);
+            ScreenManager.getInstance().navigate(INGAME_SCREEN);
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }
+    }
+
+    private void exitScreen() {
+        EventBuz.getInstance().unregister(this);
     }
 }
