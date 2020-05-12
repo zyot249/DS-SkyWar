@@ -39,10 +39,11 @@ public class EventListener {
 
             packet.id = connection.id;
             connection.playerName = packet.playerName;
+            boolean isReady = packet.isMaster;
 
             ClientInRoom client = new ClientInRoom(packet.id,
                     packet.playerName,
-                    false,
+                    isReady,
                     packet.isMaster);
             Room.clients.add(client);
             UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());

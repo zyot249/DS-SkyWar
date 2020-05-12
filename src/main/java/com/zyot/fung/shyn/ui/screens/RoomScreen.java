@@ -24,6 +24,7 @@ public class RoomScreen extends JPanel implements ActionListener {
     private ScreenManager screenManager;
     private JButton exitBtn;
     private JButton startGameBtn;
+    private JButton readyBtn;
     private JSeparator separator;
     private ArrayList<PlayerHolder> playerHolders;
     private int[] playerHolderLocations = {20, 240, 460, 680};
@@ -41,17 +42,29 @@ public class RoomScreen extends JPanel implements ActionListener {
         initUI();
         setVisible(true);
         if (args != null) {
+            boolean isMaster = false;
             if (args.containsKey("isRoomMaster")) {
                 if ((Boolean)args.get("isRoomMaster")) {
                     initRoomServer();
+                    renderUIofMaster();
+                    isMaster = (boolean) args.get("isRoomMaster");
                 }
             }
 
             if (args.containsKey("playerName")) {
                 this.playerName = args.get("playerName").toString();
-                initPlayer();
+                initPlayer(isMaster);
             }
         }
+    }
+
+    private void renderUIofMaster() {
+        startGameBtn = new JButton("Start Game");
+        startGameBtn.setBounds(660, 540, 220, 50);
+        startGameBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
+        startGameBtn.addActionListener(this);
+        add(startGameBtn);
+        remove(readyBtn);
     }
 
     private void initRoomServer() {
@@ -59,12 +72,13 @@ public class RoomScreen extends JPanel implements ActionListener {
         room.start();
     }
 
-    private void initPlayer() {
+    private void initPlayer(boolean isMaster) {
         player = new Player("localhost", HOST_PORT);
+        player.isReady = isMaster;
         player.playerName = this.playerName;
         player.connect();
         try {
-            AddConnectionRequestPacket addConnectionRequestPacket = new AddConnectionRequestPacket(playerName, true);
+            AddConnectionRequestPacket addConnectionRequestPacket = new AddConnectionRequestPacket(playerName, isMaster);
             player.sendObject(addConnectionRequestPacket);
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +87,7 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     private void initUI() {
         exitBtn = new JButton("Exit Room");
-        startGameBtn = new JButton("Start Game");
+        readyBtn = new JButton("Ready");
         separator = new JSeparator();
         playerHolders = new ArrayList<>();
         for (int i = 0; i < playerHolderLocations.length; i++) {
@@ -83,15 +97,15 @@ public class RoomScreen extends JPanel implements ActionListener {
 
         exitBtn.setBounds(20, 10, 110, 25);
         exitBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
-        startGameBtn.setBounds(660, 540, 220, 50);
-        startGameBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
+        readyBtn.setBounds(660, 540, 220, 50);
+        readyBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
         separator.setBounds(20, 525, 860, 10);
 
         exitBtn.addActionListener(this);
-        startGameBtn.addActionListener(this);
+        readyBtn.addActionListener(this);
 
         add(exitBtn);
-        add(startGameBtn);
+        add(readyBtn);
         add(separator);
 
         EventBuz.getInstance().register(this);
@@ -109,16 +123,25 @@ public class RoomScreen extends JPanel implements ActionListener {
     }
 
     public void renderPlayerList(ArrayList<ClientInRoom> clients) {
+        System.out.println("-----------------------------RENDER-----------------------------");
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
             if (i < clients.size()) {
                 ClientInRoom client = clients.get(i);
                 if (client != null) {
                     PlayerHolder holder = playerHolders.get(i);
                     holder.getPlayerNameLb().setText(client.playerName);
+                    if (client.playerName.equals(this.playerName)) {
+                        holder.setFocusPlayer();
+                    }
+                    holder.setReadyIcon(client.isReady);
+                    System.out.println("In PlayerHolder: " + holder.getPlayerNameLb().getText());
+                    System.out.println("Client " + client.playerName + " ready? " + client.isReady);
+
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
                 holder.getPlayerNameLb().setText("No Player");
+                holder.setReadyIcon(false);
             }
         }
     }
@@ -144,6 +167,8 @@ public class RoomScreen extends JPanel implements ActionListener {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
 
+        } else if (e.getSource() == readyBtn) {
+            player.notifyReadyState(!player.isReady);
         }
     }
 }
