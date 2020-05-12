@@ -1,5 +1,8 @@
 package com.zyot.fung.shyn.ui;
 
+import com.zyot.fung.shyn.ui.screens.HomeScreen;
+import com.zyot.fung.shyn.ui.screens.RoomScreen;
+
 import javax.swing.*;
 
 import static com.zyot.fung.shyn.common.Constants.*;

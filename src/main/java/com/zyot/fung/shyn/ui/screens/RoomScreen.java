@@ -1,7 +1,9 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.ui.screens;
 
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
+import com.zyot.fung.shyn.ui.PlayerHolder;
+import com.zyot.fung.shyn.ui.ScreenManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +28,7 @@ public class RoomScreen extends JPanel implements ActionListener {
         setLayout(null);
         initUI();
         setVisible(true);
+//        initRoomServer();
     }
 
     private void initRoomServer() {
@@ -67,12 +70,18 @@ public class RoomScreen extends JPanel implements ActionListener {
         }
     }
 
+    private void exitRoom() {
+        room.shutdown();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == exitBtn) {
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(HOME_SCREEN);
+            if (room != null)
+                exitRoom();
         } else if (e.getSource() == startGameBtn) {
 
         }

@@ -1,4 +1,6 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.ui.screens;
+
+import com.zyot.fung.shyn.ui.ScreenManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,18 +64,25 @@ public class HomeScreen extends JPanel implements ActionListener{
     }
     private String enterPlayerName() {
         String name = JOptionPane.showInputDialog(this, "Enter player name:", "Player Name", JOptionPane.QUESTION_MESSAGE);
-        return name;
+        if (name == null) {
+            JOptionPane.showMessageDialog(this, "Please enter a nickname before starting game!");
+        } else if (name.length() < 4) {
+            JOptionPane.showMessageDialog(this, "Your nickname is too short(must be longer than 4)!");
+        } else if (name.length() > 16) {
+            JOptionPane.showMessageDialog(this, "Your nickname is too long(must be shorter than 16!");
+        } else {
+            return name;
+        }
+        return null;
+    }
+
+    private void joinGame() {
+
     }
 
     private void createNewGame() {
         String playerName = enterPlayerName();
-        if (playerName == null) {
-            JOptionPane.showMessageDialog(this, "Please enter a nickname before starting game!");
-        } else if (playerName.length() < 4) {
-            JOptionPane.showMessageDialog(this, "Your nickname is too short(must be longer than 4)!");
-        } else if (playerName.length() > 16) {
-            JOptionPane.showMessageDialog(this, "Your nickname is too long(must be shorter than 16!");
-        } else {
+        if (playerName != null) {
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN);

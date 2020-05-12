@@ -1,6 +1,5 @@
 package com.zyot.fung.shyn;
 
-import com.zyot.fung.shyn.client.Client;
 import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
 import com.zyot.fung.shyn.server.Room;
