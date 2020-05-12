@@ -5,6 +5,8 @@ import com.zyot.fung.shyn.ui.screens.RoomScreen;
 
 import javax.swing.*;
 
+import java.util.HashMap;
+
 import static com.zyot.fung.shyn.common.Constants.*;
 
 public class ScreenManager {
@@ -39,15 +41,31 @@ public class ScreenManager {
         return instance;
     }
 
-    public void navigate(String screenName) {
+    public void navigate(String screenName, HashMap<String, Object> args) {
         if (screenName.equals(HOME_SCREEN)) {
             window.getContentPane().removeAll();
             window.getContentPane().add(getHomeScreen());
             window.revalidate();
             window.repaint();
         } else if (screenName.equals(NEW_ROOM_SCREEN)) {
+            String playerName;
+            Boolean isRoomMaster = false;
+            if (args != null) {
+                if (args.containsKey("playerName")) {
+                    playerName = args.get("playerName").toString();
+                } else {
+                    playerName = "PlayerNameDefault";
+                }
+
+                if (args.containsKey("isRoomMaster")) {
+                    isRoomMaster = (Boolean) args.get("isRoomMaster");
+                }
+            } else {
+                playerName = "PlayerNameDefault";
+            }
+
             window.getContentPane().removeAll();
-            window.getContentPane().add(getNewRoomScreen());
+            window.getContentPane().add(getNewRoomScreen(playerName, isRoomMaster));
             window.revalidate();
             window.repaint();
         } else if (screenName.equals(EXISTED_ROOM_SCREEN)) {
@@ -56,6 +74,10 @@ public class ScreenManager {
             window.revalidate();
             window.repaint();
         }
+    }
+
+    public void navigate(String screenName) {
+        navigate(screenName, null);
     }
 
     private synchronized HomeScreen getHomeScreen() {
@@ -67,13 +89,16 @@ public class ScreenManager {
 
     private synchronized RoomScreen getRoomScreen() {
         if (roomScreen == null) {
-            roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
+            roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, null);
         }
         return roomScreen;
     }
 
-    private synchronized RoomScreen getNewRoomScreen() {
-        roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
+    private synchronized RoomScreen getNewRoomScreen(String playerName, Boolean isRoomMaster) {
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("playerName", playerName);
+        args.put("isRoomMaster", isRoomMaster);
+        roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, args);
         return roomScreen;
     }
 }

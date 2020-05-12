@@ -1,9 +1,6 @@
 package com.zyot.fung.shyn.client;
 
-import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
-import com.zyot.fung.shyn.packet.AddConnectionResponsePacket;
-import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
-import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
+import com.zyot.fung.shyn.packet.*;
 
 public class EventListener {
     public void received(Object p, Client client) {
@@ -20,6 +17,9 @@ public class EventListener {
             UpdateRoomInfoPacket updateRoomInfoPacket = (UpdateRoomInfoPacket) p;
             System.out.println("Room Size: " + updateRoomInfoPacket.clients.size());
             handleUpdateRoomInfoPacket(updateRoomInfoPacket, client);
+        } else if (p instanceof ClosedServerNotificationPacket) {
+            ClosedServerNotificationPacket closedServerNotificationPacket = (ClosedServerNotificationPacket) p;
+            handleCloseServerNotificationPacket(closedServerNotificationPacket);
         }
     }
 
@@ -36,6 +36,7 @@ public class EventListener {
                     );
                 }
         );
+        EventBuz.getInstance().post(updateRoomInfoPacket);
     }
 
     private void handleAddConnectionRequestPacket(AddConnectionRequestPacket packet, Client client) {
@@ -57,5 +58,10 @@ public class EventListener {
         } else {
             ConnectionHandler.connections.put(packet.id, new Connection(packet.id, packet.playerName));
         }
+    }
+
+    private void handleCloseServerNotificationPacket(ClosedServerNotificationPacket packet) {
+        ConnectionHandler.connections.clear();
+        EventBuz.getInstance().post(packet);
     }
 }

@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import static com.zyot.fung.shyn.common.Constants.*;
 
@@ -57,9 +58,9 @@ public class HomeScreen extends JPanel implements ActionListener{
         if (e.getSource() == quitGameBtn) {
             System.exit(0);
         } else if (e.getSource() == createGameBtn) {
-            createNewGame();
+            joinRoom(true);
         } else if (e.getSource() == joinGameBtn) {
-            System.out.println(2);
+            joinRoom(false);
         }
     }
     private String enterPlayerName() {
@@ -76,16 +77,16 @@ public class HomeScreen extends JPanel implements ActionListener{
         return null;
     }
 
-    private void joinGame() {
 
-    }
-
-    private void createNewGame() {
+    private void joinRoom(Boolean isRoomMaster) {
         String playerName = enterPlayerName();
         if (playerName != null) {
+            HashMap<String, Object> args = new HashMap<>();
+            args.put("playerName", playerName);
+            args.put("isRoomMaster", isRoomMaster);
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
-            screenManager.navigate(NEW_ROOM_SCREEN);
+            screenManager.navigate(NEW_ROOM_SCREEN, args);
         }
     }
 }
