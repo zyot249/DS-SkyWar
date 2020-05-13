@@ -25,6 +25,7 @@ public class EventListener {
 
     private void handleUpdateRoomInfoPacket(UpdateRoomInfoPacket updateRoomInfoPacket, Client client) {
         System.out.println("--------------------Room Info--------------------");
+        System.out.println("Game level: " + updateRoomInfoPacket.level);
         updateRoomInfoPacket.clients.forEach(clientInRoom -> {
                     System.out.println(new StringBuilder()
                             .append("Position: ").append(updateRoomInfoPacket.clients.indexOf(clientInRoom)).append("\n")
@@ -53,11 +54,10 @@ public class EventListener {
         System.out.println(packet.message);
         client.setId(packet.id);
 
-        if (!packet.isConnectSuccess) {
-            client.close();
-        } else {
+        if (packet.isConnectSuccess) {
             ConnectionHandler.connections.put(packet.id, new Connection(packet.id, packet.playerName));
         }
+        EventBuz.getInstance().post(packet);
     }
 
     private void handleCloseServerNotificationPacket(ClosedServerNotificationPacket packet) {

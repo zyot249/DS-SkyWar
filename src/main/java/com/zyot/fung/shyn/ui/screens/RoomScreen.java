@@ -3,9 +3,7 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
-import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
-import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
-import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
+import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
 import com.zyot.fung.shyn.ui.PlayerHolder;
@@ -15,8 +13,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import static com.zyot.fung.shyn.common.Constants.*;
 
@@ -28,7 +29,9 @@ public class RoomScreen extends JPanel implements ActionListener {
     private JSeparator separator;
     private ArrayList<PlayerHolder> playerHolders;
     private int[] playerHolderLocations = {20, 240, 460, 680};
+    private JComboBox levelSelector;
 
+    private Vector<String> levels;
     private Room room;
 
     private Player player;
@@ -37,10 +40,15 @@ public class RoomScreen extends JPanel implements ActionListener {
 
 
     public RoomScreen(int width, int height, HashMap<String, Object> args) {
+        levels = new Vector<>();
+        levels.add("Easy");
+        levels.add("Medium");
+        levels.add("Hard");
+        levels.add("Super");
         setSize(width, height);
         setLayout(null);
         initUI();
-        setVisible(true);
+        setVisible(false);
         if (args != null) {
             boolean isMaster = false;
             if (args.containsKey("isRoomMaster")) {
@@ -63,6 +71,9 @@ public class RoomScreen extends JPanel implements ActionListener {
         startGameBtn.setBounds(660, 540, 220, 50);
         startGameBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
         startGameBtn.addActionListener(this);
+
+        levelSelector.setEnabled(true);
+
         add(startGameBtn);
         remove(readyBtn);
     }
@@ -95,6 +106,18 @@ public class RoomScreen extends JPanel implements ActionListener {
             add(playerHolders.get(i));
         }
 
+        levelSelector = new JComboBox(levels);
+        levelSelector.setBounds(730, 10, 150, 25);
+        levelSelector.setSelectedIndex(0);
+        levelSelector.setEditable(false);
+        levelSelector.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String levelName = e.getItem().toString();
+                requestChangeGameLevel(levelName);
+            }
+        });
+        levelSelector.setEnabled(false);
+
         exitBtn.setBounds(20, 10, 110, 25);
         exitBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
         readyBtn.setBounds(660, 540, 220, 50);
@@ -104,6 +127,7 @@ public class RoomScreen extends JPanel implements ActionListener {
         exitBtn.addActionListener(this);
         readyBtn.addActionListener(this);
 
+        add(levelSelector);
         add(exitBtn);
         add(readyBtn);
         add(separator);
@@ -112,8 +136,24 @@ public class RoomScreen extends JPanel implements ActionListener {
     }
 
     @Subscribe
+    public void onReceiveAddConnectionResponse(AddConnectionResponsePacket packet) {
+        if (packet.isConnectSuccess) {
+            display();
+        } else {
+            JOptionPane.showMessageDialog(this, packet.message, "Server Message", JOptionPane.WARNING_MESSAGE);
+            player.close();
+            backToHome();
+        }
+    }
+
+    private void display() {
+        setVisible(true);
+    }
+
+    @Subscribe
     public void onUpdateRoomInfoEvent(UpdateRoomInfoPacket updateRoomInfoPacket) {
         renderPlayerList(updateRoomInfoPacket.clients);
+        renderGameLevel(updateRoomInfoPacket.level);
     }
 
     @Subscribe
@@ -122,8 +162,12 @@ public class RoomScreen extends JPanel implements ActionListener {
         backToHome();
     }
 
-    public void renderPlayerList(ArrayList<ClientInRoom> clients) {
-        System.out.println("-----------------------------RENDER-----------------------------");
+    private void requestChangeGameLevel(String levelName) {
+        ChangeGameLevelPacket packet = new ChangeGameLevelPacket(levels.indexOf(levelName));
+        player.sendObject(packet);
+    }
+
+    private void renderPlayerList(ArrayList<ClientInRoom> clients) {
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
             if (i < clients.size()) {
                 ClientInRoom client = clients.get(i);
@@ -131,19 +175,24 @@ public class RoomScreen extends JPanel implements ActionListener {
                     PlayerHolder holder = playerHolders.get(i);
                     holder.getPlayerNameLb().setText(client.playerName);
                     if (client.playerName.equals(this.playerName)) {
-                        holder.setFocusPlayer();
+                        holder.setFocusPlayer(true);
+                    } else {
+                        holder.setFocusPlayer(false);
                     }
                     holder.setReadyIcon(client.isReady);
-                    System.out.println("In PlayerHolder: " + holder.getPlayerNameLb().getText());
-                    System.out.println("Client " + client.playerName + " ready? " + client.isReady);
 
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
                 holder.getPlayerNameLb().setText("No Player");
                 holder.setReadyIcon(false);
+                holder.setFocusPlayer(false);
             }
         }
+    }
+
+    private void renderGameLevel(int level) {
+        levelSelector.setSelectedIndex(level);
     }
 
     private void exitRoom() {

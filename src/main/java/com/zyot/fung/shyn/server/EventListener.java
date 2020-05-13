@@ -17,6 +17,19 @@ public class EventListener {
         } else if (p instanceof ReadyRequestPacket) {
             ReadyRequestPacket readyRequestPacket = (ReadyRequestPacket) p;
             handleReadyRequestPacket(readyRequestPacket, connection);
+        } else if (p instanceof ChangeGameLevelPacket) {
+            ChangeGameLevelPacket changeGameLevelPacket = (ChangeGameLevelPacket) p;
+            handleChangeGameLevelPacket(changeGameLevelPacket, connection);
+        }
+    }
+
+    private void handleChangeGameLevelPacket(ChangeGameLevelPacket packet, Connection connection) {
+        Room.setLevel(packet.level);
+        UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+
+        for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+            Connection c = entry.getValue();
+            c.sendObject(updateRoomInfoPacket);
         }
     }
 

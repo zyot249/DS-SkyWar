@@ -33,8 +33,13 @@ public class PlayerHolder extends JPanel {
         add(readyIcon);
     }
 
-    public void setFocusPlayer() {
-        setBorder(new LineBorder(Color.BLUE, 3));
+    public void setFocusPlayer(boolean isFocused) {
+        if (isFocused) {
+            setBorder(new LineBorder(Color.BLUE, 3));
+        } else {
+            setBorder(new LineBorder(Color.BLACK));
+        }
+
     }
 
     public void setReadyIcon(boolean isReady) {

@@ -9,7 +9,7 @@ public class Room extends Server{
     public Room(int port) {
         super(port);
         clients = new ArrayList<>(4);
-        Room.level = 1;
+        Room.level = 0;
     }
 
     public static int getLevel() {
