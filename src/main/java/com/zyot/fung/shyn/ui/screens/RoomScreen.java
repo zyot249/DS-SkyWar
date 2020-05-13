@@ -3,6 +3,11 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
+import com.zyot.fung.shyn.common.Constants;
+import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
+import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
+import com.zyot.fung.shyn.packet.StartGameResponsePacket;
+import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
@@ -162,12 +167,18 @@ public class RoomScreen extends JPanel implements ActionListener {
         backToHome();
     }
 
+    @Subscribe
+    public void onStartGameEvent(StartGameResponsePacket startGameEvent) {
+        startGame();
+    }
+
     private void requestChangeGameLevel(String levelName) {
         ChangeGameLevelPacket packet = new ChangeGameLevelPacket(levels.indexOf(levelName));
         player.sendObject(packet);
     }
 
-    private void renderPlayerList(ArrayList<ClientInRoom> clients) {
+    public void renderPlayerList(ArrayList<ClientInRoom> clients) {
+        System.out.println("-----------------------------RENDER-----------------------------");
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
             if (i < clients.size()) {
                 ClientInRoom client = clients.get(i);
@@ -196,6 +207,7 @@ public class RoomScreen extends JPanel implements ActionListener {
     }
 
     private void exitRoom() {
+        exitScreen();
         room.shutdown();
     }
 
@@ -207,7 +219,7 @@ public class RoomScreen extends JPanel implements ActionListener {
             exitRoom();
         if (player != null)
             player.close();
-        EventBuz.getInstance().unregister(this);
+        exitScreen();
     }
 
     @Override
@@ -215,9 +227,20 @@ public class RoomScreen extends JPanel implements ActionListener {
         if (e.getSource() == exitBtn) {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
-
+            player.sendStartGameRequest(1);
+            startGame();
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }
+    }
+
+    private void startGame() {
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("player", player);
+        ScreenManager.getInstance().navigate(INGAME_SCREEN, args);
+    }
+
+    private void exitScreen() {
+        EventBuz.getInstance().unregister(this);
     }
 }
