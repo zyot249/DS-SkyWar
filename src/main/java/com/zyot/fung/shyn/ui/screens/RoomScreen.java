@@ -6,6 +6,7 @@ import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.common.Constants;
 import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
 import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
+import com.zyot.fung.shyn.packet.StartGameResponsePacket;
 import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
@@ -123,6 +124,11 @@ public class RoomScreen extends JPanel implements ActionListener {
         backToHome();
     }
 
+    @Subscribe
+    public void onStartGameEvent(StartGameResponsePacket startGameEvent) {
+        startGame();
+    }
+
     public void renderPlayerList(ArrayList<ClientInRoom> clients) {
         System.out.println("-----------------------------RENDER-----------------------------");
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
@@ -169,10 +175,16 @@ public class RoomScreen extends JPanel implements ActionListener {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
             player.sendStartGameRequest(1);
-            ScreenManager.getInstance().navigate(INGAME_SCREEN);
+            startGame();
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }
+    }
+
+    private void startGame() {
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("player", player);
+        ScreenManager.getInstance().navigate(INGAME_SCREEN, args);
     }
 
     private void exitScreen() {

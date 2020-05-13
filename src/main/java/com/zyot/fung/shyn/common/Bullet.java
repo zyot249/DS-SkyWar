@@ -19,6 +19,7 @@ public class Bullet implements Serializable {
     }
 
     public void render(Graphics g) {
+        if (y<50) return;
         g.setColor(Color.BLUE);
         g.fillRect(x, y, 6, 10);
     }

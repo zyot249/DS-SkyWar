@@ -7,7 +7,7 @@ import com.zyot.fung.shyn.common.*;
 import com.zyot.fung.shyn.packet.PlayerIngameActionPacket;
 import com.zyot.fung.shyn.packet.StartGameResponsePacket;
 import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
-import com.zyot.fung.shyn.ui.LoadImage;
+import com.zyot.fung.shyn.ui.ImageLoader;
 import com.zyot.fung.shyn.ui.ScreenManager;
 
 import javax.swing.*;
@@ -32,10 +32,13 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     private Player player;
 
     public IngameScreen(int width, int height, HashMap<String, Object> args) {
-        initPlayer();
+        if (args != null && args.containsKey("player")) {
+            player = (Player) args.get("player");
+        } else {
+            JOptionPane.showMessageDialog(this, "Player in IngameScreen is null", "No Connection", JOptionPane.WARNING_MESSAGE);
+        }
 
         setSize(width, height);
-//        setLayout(null);
         setVisible(true);
 
         initObjectList();
@@ -45,7 +48,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         EventBuz.getInstance().register(this);
 
         ScreenManager.getInstance().getWindow().addKeyListener(this);
-        addKeyListener(this);
+        ScreenManager.getInstance().getWindow().setFocusable(true);
     }
 
     private void initPlayer() {
@@ -71,7 +74,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         add(canvas);
         canvas.setVisible(true);
 
-        LoadImage.init();
+        ImageLoader.init();
 //        renderUI();
     }
 
@@ -86,7 +89,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         g.clearRect(0,0,Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT);
 
         // draw
-        g.drawImage(LoadImage.image, 50 ,50, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
+        g.drawImage(ImageLoader.image, 50 ,50, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
         renderObjects(g);
         // end of draw
 
@@ -96,7 +99,9 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
 
     private void renderObjects(Graphics g) {
         for (Enemy e : enemies) {
-            e.render(g);
+            if (e.getX() >= 50 && e.getX() <= 450 - 25 && e.getY() <= 450 - 25 && e.getY() >= 50) {
+                e.render(g);
+            }
         }
 
         for (PlayerInGame player : playerInGames) {
@@ -106,8 +111,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         for (Bullet bullet : bullets) {
             bullet.render(g);
         }
-
-
 
         g.setColor(Color.BLUE);
         g.drawString(getPlayersScore(), 70, 500);
@@ -125,11 +128,15 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
 
     @Subscribe
     public void onUpdateIngameInfoEvent(UpdateIngameInfoPacket event) {
-//        System.out.println("IngameScreen - receive update game info event");
+//        System.out.println(String.format("IngameScreen - receive update game info event: %d players - %d bullets - %d enemies", event.playerInGames.size(), event.bullets.size(), event.enemies.size()));
 
-        this.playerInGames = event.playerInGames;
-        this.bullets = event.bullets;
-        this.enemies = event.enemies;
+        this.playerInGames.clear();
+        this.bullets.clear();
+        this.enemies.clear();
+
+        this.playerInGames.addAll(event.playerInGames);
+        this.bullets.addAll(event.bullets);
+        this.enemies.addAll(event.enemies);
         renderUI();
     }
 
@@ -146,11 +153,14 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     public void keyPressed(KeyEvent e) {
         int keycode = e.getKeyCode();
 
-        System.out.println("Keycode pressed: " + keycode);
-        System.out.println("Fireeeeeeeeeeeeeeeeee");
+//        System.out.println("Keycode pressed: " + keycode);
 
         if (keycode == KeyEvent.VK_SPACE) {
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.FIRE_PRESSED));
+        } else if (keycode == KeyEvent.VK_LEFT) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.LEFT_PRESSED));
+        } else if (keycode == KeyEvent.VK_RIGHT) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.RIGHT_PRESSED));
         }
     }
 
@@ -158,10 +168,20 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     public void keyReleased(KeyEvent e) {
         int keycode = e.getKeyCode();
 
-        System.out.println("Keycode released: " + keycode);
+//        System.out.println("Keycode released: " + keycode);
 
         if (keycode == KeyEvent.VK_SPACE) {
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.FIRE_RELEASED));
+        } else if (keycode == KeyEvent.VK_LEFT) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.LEFT_RELEASED));
+        } else if (keycode == KeyEvent.VK_RIGHT) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.RIGHT_RELEASED));
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        ScreenManager.getInstance().getWindow().removeKeyListener(this);
+        super.finalize();
     }
 }

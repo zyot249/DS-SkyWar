@@ -1,7 +1,7 @@
 package com.zyot.fung.shyn.common;
 
 import com.zyot.fung.shyn.server.GameManager;
-import com.zyot.fung.shyn.ui.LoadImage;
+import com.zyot.fung.shyn.ui.ImageLoader;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -28,10 +28,6 @@ public class PlayerInGame implements Serializable {
     }
 
     public void init() {
-//        if (isMe()) {
-//            Display.frame.addKeyListener(this);
-//        }
-
         current = System.nanoTime();
         delay = 100;
         health = 3;
@@ -39,24 +35,6 @@ public class PlayerInGame implements Serializable {
     }
 
     public void tick() {
-/*        if (!isMe() && health > 0) {
-            Random rand =  new Random();
-            int movement = rand.nextInt(30); // 0-not moving , 1-left, 2-right
-            int firing = rand.nextInt(10);   // 0-fire , other- not fire
-
-            if (movement<10){
-                    this.left = false;
-                    this.right = false;
-            } else if (movement<20){
-                    this.left = true;
-                    this.right = false;
-            } else if (movement<30) {
-                    this.left = false;
-                    this.right = true;
-            }
-
-            this.fire = (firing==1);
-        }*/
         if (health > 0) {
             if (left) {
                 if (x >= 50) {
@@ -81,9 +59,9 @@ public class PlayerInGame implements Serializable {
     public void render(Graphics g) {
         if (health > 0) {
             if (isMe()) {
-                g.drawImage(LoadImage.myPlane, x, y, 30, 30, null);
+                g.drawImage(ImageLoader.myPlane, x, y, 30, 30, null);
             } else {
-                g.drawImage(LoadImage.player, x, y, 30, 30, null);
+                g.drawImage(ImageLoader.player, x, y, 30, 30, null);
             }
         }
     }
@@ -91,39 +69,6 @@ public class PlayerInGame implements Serializable {
     private boolean isMe() {
         return id == AppPreferences.UID;
     }
-
- /*   @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int keycode = e.getKeyCode();
-        if (keycode == KeyEvent.VK_LEFT) {
-            left = true;
-        }
-        if (keycode == KeyEvent.VK_RIGHT) {
-            right = true;
-        }
-        if (keycode == KeyEvent.VK_SPACE) {
-            fire = true;
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        int keycode = e.getKeyCode();
-        if (keycode == KeyEvent.VK_LEFT) {
-            left = false;
-        }
-        if (keycode == KeyEvent.VK_RIGHT) {
-            right = false;
-        }
-        if (keycode == KeyEvent.VK_SPACE) {
-            fire = false;
-        }
-    }*/
 
     public int getX() {
         return this.x;

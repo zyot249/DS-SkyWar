@@ -76,7 +76,7 @@ public class ScreenManager {
             window.revalidate();
             window.repaint();
         } else if (screenName.equals(INGAME_SCREEN)) {
-            openNewScreen(getIngameScreen());
+            openNewScreen(getIngameScreen(args));
         }
     }
 
@@ -113,8 +113,8 @@ public class ScreenManager {
         return roomScreen;
     }
 
-    private synchronized JPanel getIngameScreen() {
-        return new IngameScreen(Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT, null);
+    private synchronized JPanel getIngameScreen(HashMap<String, Object> args) {
+        return new IngameScreen(Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT, args);
     }
 
     public JFrame getWindow() {

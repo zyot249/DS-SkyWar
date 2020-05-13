@@ -7,7 +7,7 @@ import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
 import java.util.Map;
 
 public class GameSetup implements  Runnable {
-    int numberOfPlayers = 0;
+    int numberOfPlayers;
 
     private Thread thread;
     private boolean running;
@@ -23,7 +23,7 @@ public class GameSetup implements  Runnable {
 
         manager.init();
 
-        int fps = 120;
+        int fps = 30;
 
         double timePerTick = 1000000000 / fps;
         double delta = 0;
@@ -68,36 +68,49 @@ public class GameSetup implements  Runnable {
     }
 
     private void sendNewIngameStateToClients() {
+        UpdateIngameInfoPacket updateIngameInfoPacket = new UpdateIngameInfoPacket(manager.playerInGames, GameManager.bullets, GameManager.enemies);
+
         for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
             Connection c = entry.getValue();
-
-            UpdateIngameInfoPacket updateIngameInfoPacket = new UpdateIngameInfoPacket(manager.playerInGames, GameManager.bullets, GameManager.enemies);
 
             c.sendObject(updateIngameInfoPacket);
         }
     }
 
     public void handlePlayerAction(PlayerIngameActionPacket action) {
+        PlayerInGame player = manager.playerInGames.stream()
+                .filter(playerInGame -> playerInGame.id == action.playerId)
+                .findAny()
+                .orElse(null);
+        if (player == null) return;
+
         switch (action.action) {
             case FIRE_PRESSED: {
-                PlayerInGame player = manager.playerInGames.stream()
-                        .filter(playerInGame -> playerInGame.id == action.playerId)
-                        .findAny()
-                        .orElse(null);
-                if (player != null) {
-                    System.out.println("Server - player " + action.playerId + " - IS firing");
-                    player.fire = true;
-                }
+                player.fire = true;
+                break;
+            }
+            case FIRE_RELEASED: {
+                player.fire = false;
+                break;
+            }
+            case LEFT_PRESSED: {
+                player.left = true;
                 break;
             }
             case LEFT_RELEASED: {
-                manager.playerInGames.stream()
-                        .filter(playerInGame -> playerInGame.id == action.playerId)
-                        .findAny().ifPresent(player -> {
-                            System.out.println("Server - player " + action.playerId + " - STOP firing");
-                            player.fire = false;
-                        });
+                player.left = false;
                 break;
+            }
+            case RIGHT_PRESSED: {
+                player.right = true;
+                break;
+            }
+            case RIGHT_RELEASED: {
+                player.right = false;
+                break;
+            }
+            default: {
+                System.out.println("Server - Unknown action");
             }
         }
     }
