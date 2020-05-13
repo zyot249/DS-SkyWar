@@ -1,9 +1,8 @@
 package com.zyot.fung.shyn.server;
 
-import com.zyot.fung.shyn.common.Bullet;
-import com.zyot.fung.shyn.common.Constants;
-import com.zyot.fung.shyn.common.Enemy;
-import com.zyot.fung.shyn.common.PlayerInGame;
+import com.google.common.eventbus.Subscribe;
+import com.zyot.fung.shyn.client.EventBuz;
+import com.zyot.fung.shyn.common.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,6 +21,8 @@ public class GameManager {
     private long delay;
     public GameManager(int numberOfPlayers) {
         this.nPlayer = numberOfPlayers;
+
+        EventBuz.getInstance().register(this);
     }
 
     public void init() {
@@ -29,7 +30,10 @@ public class GameManager {
         for (int i=0; i<nPlayer; i++) {
             int distance = (Constants.GAME_WIDTH) / nPlayer;
             int position = i;
-            PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance), Constants.GAME_HEIGHT + 20, i, position);
+            PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
+                    Constants.GAME_HEIGHT + 20,
+                    Room.clients.get(i).id,
+                    position);
             playerInGame.init();
             playerInGames.add(playerInGame);
         }
@@ -125,5 +129,16 @@ public class GameManager {
         enemies.removeAll(enemySet);
         bullets.removeAll(bulletSet);
 
+    }
+
+    @Subscribe
+    protected void handlePlayerLeftEvent(PlayerLeftEvent event) {
+        this.playerInGames.removeIf(player -> player.id == event.playerId);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        EventBuz.getInstance().unregister(this);
+        super.finalize();
     }
 }

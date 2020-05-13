@@ -1,5 +1,6 @@
 package com.zyot.fung.shyn.client;
 
+import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
 
 import java.io.EOFException;
@@ -94,6 +95,7 @@ public class Client implements Runnable{
                     isServerDied = true;
                     close();
                     System.out.println("Disconnected from server!");
+                    EventBuz.getInstance().post(new ClosedServerNotificationPacket("Room Master was out!"));
                 }
             }
         } catch (IOException e) {

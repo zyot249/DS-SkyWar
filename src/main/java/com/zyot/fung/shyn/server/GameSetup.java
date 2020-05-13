@@ -7,7 +7,7 @@ import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
 import java.util.Map;
 
 public class GameSetup implements  Runnable {
-    int numberOfPlayers;
+    private int numberOfPlayers;
 
     private Thread thread;
     private boolean running;
@@ -68,11 +68,12 @@ public class GameSetup implements  Runnable {
     }
 
     private void sendNewIngameStateToClients() {
-        UpdateIngameInfoPacket updateIngameInfoPacket = new UpdateIngameInfoPacket(manager.playerInGames, GameManager.bullets, GameManager.enemies);
+        UpdateIngameInfoPacket updateIngameInfoPacket = new UpdateIngameInfoPacket(manager.playerInGames,
+                GameManager.bullets,
+                GameManager.enemies);
 
         for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
             Connection c = entry.getValue();
-
             c.sendObject(updateIngameInfoPacket);
         }
     }

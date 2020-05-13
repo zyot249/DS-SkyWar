@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.common.*;
+import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.PlayerIngameActionPacket;
 import com.zyot.fung.shyn.packet.StartGameResponsePacket;
 import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
@@ -19,6 +20,8 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.zyot.fung.shyn.common.Constants.HOME_SCREEN;
 
 public class IngameScreen extends JPanel implements ActionListener, KeyListener {
     private ArrayList<PlayerInGame> playerInGames;
@@ -140,6 +143,16 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         renderUI();
     }
 
+    @Subscribe
+    public void onClosedServerEvent(ClosedServerNotificationPacket event) {
+        backToHome();
+    }
+
+    private void backToHome() {
+//        exitScreen();
+        ScreenManager.getInstance().navigate(HOME_SCREEN);
+    }
+
     private void exitScreen() {
         EventBuz.getInstance().unregister(this);
     }
@@ -182,6 +195,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     @Override
     protected void finalize() throws Throwable {
         ScreenManager.getInstance().getWindow().removeKeyListener(this);
+        EventBuz.getInstance().unregister(this);
         super.finalize();
     }
 }

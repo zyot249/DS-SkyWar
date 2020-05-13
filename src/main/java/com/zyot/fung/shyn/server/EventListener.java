@@ -109,17 +109,19 @@ public class EventListener {
         // only room master can start game
         if (connection.id == Room.clients.get(0).id) {
             System.out.println("Server - EventLister - Start Game");
-
+            ArrayList<PlayerInGame> playerInGames = new ArrayList<>();
+            int nPlayers = Room.clients.size();
+            for (int i=0; i<nPlayers; i++) {
+                int distance = (Constants.GAME_WIDTH) / nPlayers;
+                int position = i;
+                PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
+                        Constants.GAME_HEIGHT + 20,
+                        Room.clients.get(i).id,
+                        position);
+                playerInGames.add(playerInGame);
+            }
             for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                 Connection c = entry.getValue();
-                ArrayList<PlayerInGame> playerInGames = new ArrayList<>();
-                int nPlayers = Room.clients.size();
-                for (int i=0; i<nPlayers; i++) {
-                    int distance = (Constants.GAME_WIDTH) / nPlayers;
-                    int position = i;
-                    PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance), Constants.GAME_HEIGHT + 20, Room.clients.get(i).id, position);
-                    playerInGames.add(playerInGame);
-                }
                 c.sendObject(new StartGameResponsePacket(playerInGames));
             }
 

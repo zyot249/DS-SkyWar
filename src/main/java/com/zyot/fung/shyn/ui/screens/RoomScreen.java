@@ -3,11 +3,6 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
-import com.zyot.fung.shyn.common.Constants;
-import com.zyot.fung.shyn.packet.AddConnectionRequestPacket;
-import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
-import com.zyot.fung.shyn.packet.StartGameResponsePacket;
-import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
@@ -19,7 +14,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
@@ -163,8 +157,8 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     @Subscribe
     public void onClosedServerEvent(ClosedServerNotificationPacket closedServerNotificationPacket) {
-        JOptionPane.showMessageDialog(this, "Room is closed by master!", "Room Closed", JOptionPane.WARNING_MESSAGE);
         backToHome();
+        JOptionPane.showMessageDialog(this, closedServerNotificationPacket.message, "Room Closed", JOptionPane.WARNING_MESSAGE);
     }
 
     @Subscribe
@@ -207,7 +201,6 @@ public class RoomScreen extends JPanel implements ActionListener {
     }
 
     private void exitRoom() {
-        exitScreen();
         room.shutdown();
     }
 
