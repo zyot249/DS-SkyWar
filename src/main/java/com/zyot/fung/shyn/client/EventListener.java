@@ -1,5 +1,6 @@
 package com.zyot.fung.shyn.client;
 
+import com.zyot.fung.shyn.common.AppPreferences;
 import com.zyot.fung.shyn.packet.*;
 
 public class EventListener {
@@ -20,6 +21,12 @@ public class EventListener {
         } else if (p instanceof ClosedServerNotificationPacket) {
             ClosedServerNotificationPacket closedServerNotificationPacket = (ClosedServerNotificationPacket) p;
             handleCloseServerNotificationPacket(closedServerNotificationPacket);
+        } else if (p instanceof StartGameResponsePacket) {
+            StartGameResponsePacket startGameResponse = (StartGameResponsePacket) p;
+            handleStartGameResponsePacket(startGameResponse);
+        } else if (p instanceof UpdateIngameInfoPacket) {
+            UpdateIngameInfoPacket packet = (UpdateIngameInfoPacket) p;
+            handleUpdateIngameInfoPacket(packet);
         }
     }
 
@@ -30,7 +37,7 @@ public class EventListener {
                     System.out.println(new StringBuilder()
                             .append("Position: ").append(updateRoomInfoPacket.clients.indexOf(clientInRoom)).append("\n")
                             .append("ID: ").append(clientInRoom.id).append("\n")
-                            .append("Player name: ").append(clientInRoom.playerName).append("\n")
+                            .append("PlayerInGame name: ").append(clientInRoom.playerName).append("\n")
                             .append("Ready? ").append(clientInRoom.isReady).append("\n")
                             .append("Master? ").append(clientInRoom.isMaster).append("\n")
                             .toString()
@@ -42,17 +49,18 @@ public class EventListener {
 
     private void handleAddConnectionRequestPacket(AddConnectionRequestPacket packet, Client client) {
         ConnectionHandler.connections.put(packet.id, new Connection(packet.id, packet.playerName));
-        System.out.println("Player " + packet.playerName + " has connected");
+        System.out.println("PlayerInGame " + packet.playerName + " has connected");
     }
 
     private void handleRemoveConnectionPacket(RemoveConnectionPacket packet, Client client) {
-        System.out.println("Player: " + packet.playerName + " has disconnected");
+        System.out.println("PlayerInGame: " + packet.playerName + " has disconnected");
         ConnectionHandler.connections.remove(packet.id);
     }
 
     private void handleAddConnectionResponsePacket(AddConnectionResponsePacket packet, Client client) {
         System.out.println(packet.message);
         client.setId(packet.id);
+        AppPreferences.UID = packet.id;
 
         if (packet.isConnectSuccess) {
             ConnectionHandler.connections.put(packet.id, new Connection(packet.id, packet.playerName));
@@ -62,6 +70,14 @@ public class EventListener {
 
     private void handleCloseServerNotificationPacket(ClosedServerNotificationPacket packet) {
         ConnectionHandler.connections.clear();
+        EventBuz.getInstance().post(packet);
+    }
+
+    private void handleStartGameResponsePacket(StartGameResponsePacket packet) {
+        EventBuz.getInstance().post(packet);
+    }
+
+    private void handleUpdateIngameInfoPacket(UpdateIngameInfoPacket packet) {
         EventBuz.getInstance().post(packet);
     }
 }

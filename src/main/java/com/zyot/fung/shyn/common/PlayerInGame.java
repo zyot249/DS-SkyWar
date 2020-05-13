@@ -1,28 +1,33 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.common;
+
+import com.zyot.fung.shyn.server.GameManager;
+import com.zyot.fung.shyn.ui.ImageLoader;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.io.Serializable;
 
-public class Player implements KeyListener {
+public class PlayerInGame implements Serializable {
+    private int position;
+    public int id;
     private int x;
     private int y;
-    private boolean fire;
-    private boolean right;
-    private boolean left;
+    public boolean fire;
+    public boolean right;
+    public boolean left;
 
     private long current;
     private long delay;
     private int health;
     private int score;
 
-    public Player(int x, int y) {
+    public PlayerInGame(int x, int y, int id, int position) {
+        this.id = id;
+        this.position = position;
         this.x = x;
         this.y = y;
     }
 
     public void init() {
-        Display.frame.addKeyListener(this);
         current = System.nanoTime();
         delay = 100;
         health = 3;
@@ -53,42 +58,16 @@ public class Player implements KeyListener {
 
     public void render(Graphics g) {
         if (health > 0) {
-            g.drawImage(ImageLoader.player, x, y, 30, 30, null);
+            if (isMe()) {
+                g.drawImage(ImageLoader.myPlane, x, y, 30, 30, null);
+            } else {
+                g.drawImage(ImageLoader.player, x, y, 30, 30, null);
+            }
         }
     }
 
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int keycode = e.getKeyCode();
-        if (keycode == KeyEvent.VK_LEFT) {
-            left = true;
-        }
-        if (keycode == KeyEvent.VK_RIGHT) {
-            right = true;
-        }
-        if (keycode == KeyEvent.VK_SPACE) {
-            fire = true;
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        int keycode = e.getKeyCode();
-        if (keycode == KeyEvent.VK_LEFT) {
-            left = false;
-        }
-        if (keycode == KeyEvent.VK_RIGHT) {
-            right = false;
-        }
-        if (keycode == KeyEvent.VK_SPACE) {
-            fire = false;
-        }
+    private boolean isMe() {
+        return id == AppPreferences.UID;
     }
 
     public int getX() {
@@ -113,5 +92,9 @@ public class Player implements KeyListener {
 
     public void incScore() {
         this.score = this.score + 1;
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
