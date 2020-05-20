@@ -171,6 +171,11 @@ public class RoomScreen extends JPanel implements ActionListener {
         player.sendObject(packet);
     }
 
+    @Subscribe
+    public void onNotReadyWarningEvent(NotReadyWarningPacket notReadyWarningPacket) {
+        JOptionPane.showMessageDialog(this, notReadyWarningPacket.message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+
     public void renderPlayerList(ArrayList<ClientInRoom> clients) {
         System.out.println("-----------------------------RENDER-----------------------------");
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
@@ -221,7 +226,6 @@ public class RoomScreen extends JPanel implements ActionListener {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
             player.sendStartGameRequest(1);
-            startGame();
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }

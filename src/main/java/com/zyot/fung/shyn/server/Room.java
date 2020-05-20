@@ -48,4 +48,12 @@ public class Room extends Server{
         super.finalize();
         EventBuz.getInstance().unregister(this);
     }
+
+    public static boolean isAllClientsReady() {
+        for (ClientInRoom client : clients) {
+            if (!client.isReady)
+                return false;
+        }
+        return true;
+    }
 }
