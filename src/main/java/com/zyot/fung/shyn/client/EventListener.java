@@ -27,7 +27,14 @@ public class EventListener {
         } else if (p instanceof UpdateIngameInfoPacket) {
             UpdateIngameInfoPacket packet = (UpdateIngameInfoPacket) p;
             handleUpdateIngameInfoPacket(packet);
+        } else if (p instanceof NotReadyWarningPacket) {
+            NotReadyWarningPacket packet = (NotReadyWarningPacket) p;
+            handleNotReadyWarningPacket(packet);
         }
+    }
+
+    private void handleNotReadyWarningPacket(NotReadyWarningPacket packet) {
+        EventBuz.getInstance().post(packet);
     }
 
     private void handleUpdateRoomInfoPacket(UpdateRoomInfoPacket updateRoomInfoPacket, Client client) {

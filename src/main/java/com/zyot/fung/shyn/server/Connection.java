@@ -1,5 +1,7 @@
 package com.zyot.fung.shyn.server;
 
+import com.zyot.fung.shyn.client.EventBuz;
+import com.zyot.fung.shyn.common.PlayerLeftEvent;
 import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
 import com.zyot.fung.shyn.packet.UpdateRoomInfoPacket;
@@ -54,7 +56,6 @@ public class Connection implements Runnable {
         }
         if (!socket.isClosed()) {
             close();
-
         }
     }
 
@@ -70,6 +71,8 @@ public class Connection implements Runnable {
                         }
                     }
                 } else {
+                    EventBuz.getInstance().post(new PlayerLeftEvent(this.id));
+
                     Room.clients.removeIf(clientInRoom -> clientInRoom.id == this.id);
                     UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
 

@@ -1,5 +1,7 @@
 package com.zyot.fung.shyn.common;
 
+import com.zyot.fung.shyn.ui.ImageLoader;
+
 import java.awt.*;
 import java.io.Serializable;
 
@@ -20,8 +22,9 @@ public class Bullet implements Serializable {
 
     public void render(Graphics g) {
         if (y<50) return;
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, 6, 10);
+//        g.setColor(Color.BLUE);
+//        g.fillRect(x, y, 6, 10);
+        g.drawImage(ImageLoader.bullet, x, y, 6, 12, null);
     }
 
     public int getX() {

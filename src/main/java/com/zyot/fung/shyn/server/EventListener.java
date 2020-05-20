@@ -108,22 +108,33 @@ public class EventListener {
     private void handleStartGameRequestPacket(StartGameRequestPacket packet, Connection connection) {
         // only room master can start game
         if (connection.id == Room.clients.get(0).id) {
-            System.out.println("Server - EventLister - Start Game");
-
-            for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-                Connection c = entry.getValue();
+            if (!Room.isAllClientsReady()) {
+                for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                    Connection c = entry.getValue();
+                    NotReadyWarningPacket notReadyWarningPacket = new NotReadyWarningPacket();
+                    notReadyWarningPacket.message = "All player must be ready!";
+                    c.sendObject(notReadyWarningPacket);
+                }
+            } else {
+                System.out.println("Server - EventLister - Start Game");
                 ArrayList<PlayerInGame> playerInGames = new ArrayList<>();
                 int nPlayers = Room.clients.size();
                 for (int i=0; i<nPlayers; i++) {
                     int distance = (Constants.GAME_WIDTH) / nPlayers;
                     int position = i;
-                    PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance), Constants.GAME_HEIGHT + 20, Room.clients.get(i).id, position);
+                    PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
+                            Constants.GAME_HEIGHT + 20,
+                            Room.clients.get(i).id,
+                            position);
                     playerInGames.add(playerInGame);
                 }
-                c.sendObject(new StartGameResponsePacket(playerInGames));
-            }
+                for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                    Connection c = entry.getValue();
+                    c.sendObject(new StartGameResponsePacket(playerInGames));
+                }
 
-            EventBuz.getInstance().post(new InitGameSetupEvent());
+                EventBuz.getInstance().post(new InitGameSetupEvent());
+            }
         }
     }
 
