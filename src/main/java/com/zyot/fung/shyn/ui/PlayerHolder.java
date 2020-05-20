@@ -9,6 +9,7 @@ import static com.zyot.fung.shyn.common.Constants.*;
 public class PlayerHolder extends JPanel {
     private JLabel playerNameLb;
     private JPanel readyIcon;
+    private ImagePanel avartar;
 
     public PlayerHolder(int x, int y) {
         setLayout(null);
@@ -23,6 +24,9 @@ public class PlayerHolder extends JPanel {
         playerNameLb.setBounds(20, 260, 160, 30);
         playerNameLb.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
 
+        avartar = new ImagePanel();
+        avartar.setBounds(20, 30, 160, 170);
+
         readyIcon = new JPanel();
         readyIcon.setBounds(170, 0, 30, 30);
         readyIcon.setBorder(new LineBorder(Color.BLACK, 3));
@@ -31,6 +35,7 @@ public class PlayerHolder extends JPanel {
 
         add(playerNameLb);
         add(readyIcon);
+        add(avartar);
     }
 
     public void setFocusPlayer(boolean isFocused) {
@@ -47,7 +52,15 @@ public class PlayerHolder extends JPanel {
         repaint();
     }
 
-    public JLabel getPlayerNameLb() {
-        return playerNameLb;
+//    public JLabel getPlayerNameLb() {
+//        return playerNameLb;
+//    }
+
+    public void setImage(boolean isExistPlayer) {
+        avartar.setImage(isExistPlayer);
+    }
+
+    public void setPlayerName(String name) {
+        playerNameLb.setText(name);
     }
 }

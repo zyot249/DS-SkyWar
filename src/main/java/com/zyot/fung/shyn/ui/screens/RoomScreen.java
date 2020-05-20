@@ -203,18 +203,19 @@ public class RoomScreen extends JPanel implements ActionListener {
                 ClientInRoom client = clients.get(i);
                 if (client != null) {
                     PlayerHolder holder = playerHolders.get(i);
-                    holder.getPlayerNameLb().setText(client.playerName);
+                    holder.setPlayerName(client.playerName);
                     if (client.playerName.equals(this.playerName)) {
                         holder.setFocusPlayer(true);
                     } else {
                         holder.setFocusPlayer(false);
                     }
                     holder.setReadyIcon(client.isReady);
-
+                    holder.setImage(true);
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
-                holder.getPlayerNameLb().setText("No Player");
+                holder.setPlayerName("No Player");
+                holder.setImage(false);
                 holder.setReadyIcon(false);
                 holder.setFocusPlayer(false);
             }

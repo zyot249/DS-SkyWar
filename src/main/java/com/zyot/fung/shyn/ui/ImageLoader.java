@@ -11,15 +11,15 @@ public class ImageLoader {
     public static BufferedImage bullet;
 
     public static void init() {
-       image = imageLoader("/whte.png");
-       entities = imageLoader("/airplane.png");
-       enemy = imageLoader("/airplane.png").getSubimage(0, 0,85, 90);
-       player = imageLoader("/plane2.png").getSubimage(5, 10, 290, 240);
-       myPlane = imageLoader("/plane2.png").getSubimage(5, 10, 290, 240);
-       bullet = imageLoader("/bullet4.png").getSubimage(500, 0, 280, 1280);
+       image = loadImage("/whte.png");
+       entities = loadImage("/airplane.png");
+       enemy = loadImage("/airplane.png").getSubimage(0, 0,85, 90);
+       player = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
+       myPlane = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
+       bullet = loadImage("/bullet4.png").getSubimage(500, 0, 280, 1280);
     }
 
-    private static BufferedImage imageLoader(String path) {
+    public static BufferedImage loadImage(String path) {
         try {
             System.out.println(path);
             System.out.println( ImageLoader.class.getResource(ImageLoader.class.getSimpleName() + ".class") );
