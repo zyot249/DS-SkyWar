@@ -52,6 +52,7 @@ public class ScreenManager {
         } else if (screenName.equals(NEW_ROOM_SCREEN)) {
             String playerName;
             Boolean isRoomMaster = false;
+            String ip = "";
             if (args != null) {
                 if (args.containsKey("playerName")) {
                     playerName = args.get("playerName").toString();
@@ -62,12 +63,16 @@ public class ScreenManager {
                 if (args.containsKey("isRoomMaster")) {
                     isRoomMaster = (Boolean) args.get("isRoomMaster");
                 }
+
+                if (args.containsKey("ip")) {
+                    ip = (String) args.get("ip");
+                }
             } else {
                 playerName = "PlayerNameDefault";
             }
 
             window.getContentPane().removeAll();
-            window.getContentPane().add(getNewRoomScreen(playerName, isRoomMaster));
+            window.getContentPane().add(getNewRoomScreen(playerName, isRoomMaster, ip));
             window.revalidate();
             window.repaint();
         } else if (screenName.equals(EXISTED_ROOM_SCREEN)) {
@@ -105,10 +110,11 @@ public class ScreenManager {
         return roomScreen;
     }
 
-    private synchronized RoomScreen getNewRoomScreen(String playerName, Boolean isRoomMaster) {
+    private synchronized RoomScreen getNewRoomScreen(String playerName, Boolean isRoomMaster, String ip) {
         HashMap<String, Object> args = new HashMap<>();
         args.put("playerName", playerName);
         args.put("isRoomMaster", isRoomMaster);
+        args.put("ip", ip);
         roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, args);
         return roomScreen;
     }

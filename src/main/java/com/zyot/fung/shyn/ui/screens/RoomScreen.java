@@ -6,6 +6,7 @@ import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
+import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.PlayerHolder;
 import com.zyot.fung.shyn.ui.ScreenManager;
 
@@ -26,12 +27,14 @@ public class RoomScreen extends JPanel implements ActionListener {
     private JButton startGameBtn;
     private JButton readyBtn;
     private JSeparator separator;
+    private JLabel roomIDLb;
     private ArrayList<PlayerHolder> playerHolders;
     private int[] playerHolderLocations = {20, 240, 460, 680};
     private JComboBox levelSelector;
 
     private Vector<String> levels;
     private Room room;
+    private String host;
 
     private Player player;
     public String playerName;
@@ -53,14 +56,20 @@ public class RoomScreen extends JPanel implements ActionListener {
             if (args.containsKey("isRoomMaster")) {
                 if ((Boolean)args.get("isRoomMaster")) {
                     initRoomServer();
-                    renderUIofMaster();
                     isMaster = (boolean) args.get("isRoomMaster");
+                    this.host = Utils.getLocalAddress();
+
+                    renderUIofMaster();
+                } else {
+                    if (args.containsKey("ip")) {
+                        this.host = (String) args.get("ip");
+                    }
                 }
             }
 
             if (args.containsKey("playerName")) {
                 this.playerName = args.get("playerName").toString();
-                initPlayer(isMaster);
+                initPlayer(isMaster, this.host);
             }
         }
     }
@@ -71,19 +80,24 @@ public class RoomScreen extends JPanel implements ActionListener {
         startGameBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
         startGameBtn.addActionListener(this);
 
+        roomIDLb = new JLabel("Room ID: " + this.host);
+        roomIDLb.setBounds(430, 10, 300, 25);
+
+
         levelSelector.setEnabled(true);
 
+        add(roomIDLb);
         add(startGameBtn);
         remove(readyBtn);
     }
 
     private void initRoomServer() {
-        room = new Room(HOST_PORT);
+        room = new Room();
         room.start();
     }
 
-    private void initPlayer(boolean isMaster) {
-        player = new Player("localhost", HOST_PORT);
+    private void initPlayer(boolean isMaster, String host) {
+        player = new Player(host, HOST_PORT);
         player.isReady = isMaster;
         player.playerName = this.playerName;
         player.connect();
@@ -176,6 +190,12 @@ public class RoomScreen extends JPanel implements ActionListener {
         JOptionPane.showMessageDialog(this, notReadyWarningPacket.message, "Warning", JOptionPane.WARNING_MESSAGE);
     }
 
+    @Subscribe
+    public void onServerNotFoundEvent(ServerNotFoundPacket serverNotFoundPacket) {
+        JOptionPane.showMessageDialog(this, serverNotFoundPacket.message, "Warning", JOptionPane.WARNING_MESSAGE);
+        backToHome();
+    }
+
     public void renderPlayerList(ArrayList<ClientInRoom> clients) {
         System.out.println("-----------------------------RENDER-----------------------------");
         for (int i = 0; i < MAX_ROOM_SIZE; i++) {
@@ -183,18 +203,19 @@ public class RoomScreen extends JPanel implements ActionListener {
                 ClientInRoom client = clients.get(i);
                 if (client != null) {
                     PlayerHolder holder = playerHolders.get(i);
-                    holder.getPlayerNameLb().setText(client.playerName);
+                    holder.setPlayerName(client.playerName);
                     if (client.playerName.equals(this.playerName)) {
                         holder.setFocusPlayer(true);
                     } else {
                         holder.setFocusPlayer(false);
                     }
                     holder.setReadyIcon(client.isReady);
-
+                    holder.setImage(true);
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
-                holder.getPlayerNameLb().setText("No Player");
+                holder.setPlayerName("No Player");
+                holder.setImage(false);
                 holder.setReadyIcon(false);
                 holder.setFocusPlayer(false);
             }

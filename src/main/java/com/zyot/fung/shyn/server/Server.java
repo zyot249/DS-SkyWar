@@ -1,20 +1,26 @@
 package com.zyot.fung.shyn.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static com.zyot.fung.shyn.common.Constants.HOST_PORT;
+
 public class Server implements Runnable{
     private int port;
+    private int backlog;
     private ServerSocket serverSocket;
     private boolean running = false;
     private int id = 0;
 
-    public Server(int port) {
-        this.port = port;
+    public Server() {
+        this.port = HOST_PORT;
+        this.backlog = 100;
 
         try {
-            serverSocket = new ServerSocket(port);
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            serverSocket = new ServerSocket(this.port, this.backlog, inetAddress);
         } catch (IOException e) {
             e.printStackTrace();
         }

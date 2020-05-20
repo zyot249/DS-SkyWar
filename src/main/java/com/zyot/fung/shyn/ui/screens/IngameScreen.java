@@ -54,10 +54,10 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         ScreenManager.getInstance().getWindow().setFocusable(true);
     }
 
-    private void initPlayer() {
-        player = new Player(AppPreferences.HOST_IP, Constants.HOST_PORT);
-        player.connect();
-    }
+//    private void initPlayer(String host) {
+//        player = new Player(host, Constants.HOST_PORT);
+//        player.connect();
+//    }
 
     private void initObjectList() {
         playerInGames = new ArrayList<>();

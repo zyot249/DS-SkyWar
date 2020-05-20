@@ -1,5 +1,6 @@
 package com.zyot.fung.shyn.ui.screens;
 
+import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.ScreenManager;
 
 import javax.swing.*;
@@ -79,11 +80,29 @@ public class HomeScreen extends JPanel implements ActionListener{
 
 
     private void joinRoom(Boolean isRoomMaster) {
+        String ip = "";
+        if (!isRoomMaster) {
+            ip = JOptionPane.showInputDialog(this, "Enter room ID:", "Room ID", JOptionPane.QUESTION_MESSAGE);
+            if (!Utils.validateIP(ip)) {
+                JOptionPane.showMessageDialog(this, "Wrong room ID! Please try again!");
+                return;
+            }
+
+            if (Utils.availablePort(ip, HOST_PORT)) {
+                JOptionPane.showMessageDialog(this, "Server not found!");
+                return;
+            }
+        }
         String playerName = enterPlayerName();
         if (playerName != null) {
             HashMap<String, Object> args = new HashMap<>();
             args.put("playerName", playerName);
             args.put("isRoomMaster", isRoomMaster);
+
+            if (!ip.equals("")) {
+                args.put("ip", ip);
+            }
+
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN, args);

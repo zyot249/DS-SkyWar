@@ -12,8 +12,7 @@ public class Room extends Server{
     public static GameSetup game;
     private static int level;
 
-    public Room(int port) {
-        super(port);
+    public Room() {
         clients = new ArrayList<>(4);
 
         EventBuz.getInstance().register(this);
