@@ -26,6 +26,7 @@ public class RoomScreen extends JPanel implements ActionListener {
     private JButton startGameBtn;
     private JButton readyBtn;
     private JSeparator separator;
+    private JLabel roomIDLb;
     private ArrayList<PlayerHolder> playerHolders;
     private int[] playerHolderLocations = {20, 240, 460, 680};
     private JComboBox levelSelector;
@@ -55,13 +56,20 @@ public class RoomScreen extends JPanel implements ActionListener {
                     initRoomServer();
                     renderUIofMaster();
                     isMaster = (boolean) args.get("isRoomMaster");
+
+                    this.playerName = args.get("playerName").toString();
+                    initPlayer(isMaster, room.port);
+                } else {
+                    this.playerName = args.get("playerName").toString();
+                    int port = (int) args.get("port");
+                    initPlayer(false, port);
                 }
             }
 
-            if (args.containsKey("playerName")) {
-                this.playerName = args.get("playerName").toString();
-                initPlayer(isMaster);
-            }
+//            if (args.containsKey("playerName")) {
+//                this.playerName = args.get("playerName").toString();
+//                initPlayer(isMaster, room.port);
+//            }
         }
     }
 
@@ -71,19 +79,24 @@ public class RoomScreen extends JPanel implements ActionListener {
         startGameBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 26));
         startGameBtn.addActionListener(this);
 
+        roomIDLb = new JLabel("Room ID: " + room.port);
+        roomIDLb.setBounds(585, 10, 120, 25);
+
+
         levelSelector.setEnabled(true);
 
+        add(roomIDLb);
         add(startGameBtn);
         remove(readyBtn);
     }
 
     private void initRoomServer() {
-        room = new Room(HOST_PORT);
+        room = new Room();
         room.start();
     }
 
-    private void initPlayer(boolean isMaster) {
-        player = new Player("localhost", HOST_PORT);
+    private void initPlayer(boolean isMaster, int port) {
+        player = new Player(port);
         player.isReady = isMaster;
         player.playerName = this.playerName;
         player.connect();
@@ -174,6 +187,12 @@ public class RoomScreen extends JPanel implements ActionListener {
     @Subscribe
     public void onNotReadyWarningEvent(NotReadyWarningPacket notReadyWarningPacket) {
         JOptionPane.showMessageDialog(this, notReadyWarningPacket.message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+
+    @Subscribe
+    public void onServerNotFoundEvent(ServerNotFoundPacket serverNotFoundPacket) {
+        JOptionPane.showMessageDialog(this, serverNotFoundPacket.message, "Warning", JOptionPane.WARNING_MESSAGE);
+        backToHome();
     }
 
     public void renderPlayerList(ArrayList<ClientInRoom> clients) {

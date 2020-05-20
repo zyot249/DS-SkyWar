@@ -1,5 +1,6 @@
 package com.zyot.fung.shyn.ui.screens;
 
+import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.ScreenManager;
 
 import javax.swing.*;
@@ -8,7 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
-import static com.zyot.fung.shyn.common.Constants.*;
+import static com.zyot.fung.shyn.common.Constants.NEW_ROOM_SCREEN;
+import static com.zyot.fung.shyn.common.Constants.NORMAL_FONT;
 
 public class HomeScreen extends JPanel implements ActionListener{
 
@@ -79,11 +81,31 @@ public class HomeScreen extends JPanel implements ActionListener{
 
 
     private void joinRoom(Boolean isRoomMaster) {
+        int port = 0;
+        if (!isRoomMaster) {
+            try {
+                port = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter room ID:", "Room ID", JOptionPane.QUESTION_MESSAGE));
+                if (port >= 50000) {
+                    JOptionPane.showMessageDialog(this, "Room ID is always smaller than 50000!");
+                    return;
+                }
+                if (Utils.availablePort(port)) {
+                    JOptionPane.showMessageDialog(this, "Cannot find room with this ID!");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Room ID must be a number!");
+                return;
+            }
+        }
         String playerName = enterPlayerName();
         if (playerName != null) {
             HashMap<String, Object> args = new HashMap<>();
             args.put("playerName", playerName);
             args.put("isRoomMaster", isRoomMaster);
+            if (port != 0) {
+                args.put("port", port);
+            }
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN, args);

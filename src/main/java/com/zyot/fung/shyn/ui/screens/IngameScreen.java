@@ -55,7 +55,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     }
 
     private void initPlayer() {
-        player = new Player(AppPreferences.HOST_IP, Constants.HOST_PORT);
+        player = new Player(Constants.HOST_PORT);
         player.connect();
     }
 

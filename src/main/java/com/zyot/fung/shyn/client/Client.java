@@ -2,14 +2,13 @@ package com.zyot.fung.shyn.client;
 
 import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.RemoveConnectionPacket;
+import com.zyot.fung.shyn.packet.ServerNotFoundPacket;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 
 public class Client implements Runnable{
     private String host;
@@ -27,10 +26,15 @@ public class Client implements Runnable{
 
     private boolean isServerDied = false;
 
-    public Client(String host, int port) {
-        this.host = host;
-        this.port = port;
-        this.id = -1;
+    public Client(int port) {
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            this.host = inetAddress.getHostAddress();
+            this.port = port;
+            this.id = -1;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public void connect() {
@@ -42,6 +46,9 @@ public class Client implements Runnable{
             new Thread(this).start();
         } catch (ConnectException e) {
             System.out.println("Unable to connect to the server");
+            ServerNotFoundPacket serverNotFoundPacket = new ServerNotFoundPacket();
+            serverNotFoundPacket.message = "Unable to connect to the server!";
+            EventBuz.getInstance().post(serverNotFoundPacket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,6 +76,9 @@ public class Client implements Runnable{
     }
 
     public void sendObject(Object packet) {
+        if (out == null) {
+            return;
+        }
         try {
             out.writeObject(packet);
         } catch (IOException e) {

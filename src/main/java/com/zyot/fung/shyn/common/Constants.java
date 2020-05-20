@@ -25,4 +25,7 @@ public class Constants {
     public static final String INGAME_SCREEN = "IngameScreen";
 
     public static final String NORMAL_FONT = "Colonna MT";
+
+    public static final int MAX_PORT = 49998;
+    public static final int MIN_PORT = 40000;
 }

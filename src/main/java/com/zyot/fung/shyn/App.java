@@ -48,7 +48,7 @@ public class App {
     private static void joinGame(boolean isMaster) {
         Scanner scanner = new Scanner(System.in);
         String playerName = enterPlayerName(scanner);
-        Player player = new Player("localhost", HOST_PORT);
+        Player player = new Player(HOST_PORT);
         player.playerName = playerName;
         player.connect();
 
@@ -93,7 +93,7 @@ public class App {
     }
 
     private static void createNewGame() {
-        Room room = new Room(HOST_PORT);
+        Room room = new Room();
         room.start();
 
         joinGame(true);
