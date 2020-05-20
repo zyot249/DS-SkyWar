@@ -6,8 +6,8 @@ import com.zyot.fung.shyn.packet.StartGameRequestPacket;
 public class Player extends Client {
     public boolean isReady;
 
-    public Player(int port) {
-        super(port);
+    public Player(String host, int port) {
+        super(host, port);
         isReady = false;
     }
 

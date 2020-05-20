@@ -9,8 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
-import static com.zyot.fung.shyn.common.Constants.NEW_ROOM_SCREEN;
-import static com.zyot.fung.shyn.common.Constants.NORMAL_FONT;
+import static com.zyot.fung.shyn.common.Constants.*;
 
 public class HomeScreen extends JPanel implements ActionListener{
 
@@ -81,20 +80,16 @@ public class HomeScreen extends JPanel implements ActionListener{
 
 
     private void joinRoom(Boolean isRoomMaster) {
-        int port = 0;
+        String ip = "";
         if (!isRoomMaster) {
-            try {
-                port = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter room ID:", "Room ID", JOptionPane.QUESTION_MESSAGE));
-                if (port >= 50000) {
-                    JOptionPane.showMessageDialog(this, "Room ID is always smaller than 50000!");
-                    return;
-                }
-                if (Utils.availablePort(port)) {
-                    JOptionPane.showMessageDialog(this, "Cannot find room with this ID!");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Room ID must be a number!");
+            ip = JOptionPane.showInputDialog(this, "Enter room ID:", "Room ID", JOptionPane.QUESTION_MESSAGE);
+            if (!Utils.validateIP(ip)) {
+                JOptionPane.showMessageDialog(this, "Wrong room ID! Please try again!");
+                return;
+            }
+
+            if (Utils.availablePort(ip, HOST_PORT)) {
+                JOptionPane.showMessageDialog(this, "Server not found!");
                 return;
             }
         }
@@ -103,9 +98,11 @@ public class HomeScreen extends JPanel implements ActionListener{
             HashMap<String, Object> args = new HashMap<>();
             args.put("playerName", playerName);
             args.put("isRoomMaster", isRoomMaster);
-            if (port != 0) {
-                args.put("port", port);
+
+            if (!ip.equals("")) {
+                args.put("ip", ip);
             }
+
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN, args);

@@ -5,20 +5,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static com.zyot.fung.shyn.common.Constants.MAX_PORT;
-import static com.zyot.fung.shyn.common.Constants.MIN_PORT;
+import static com.zyot.fung.shyn.common.Constants.HOST_PORT;
 
 public class Server implements Runnable{
-    public int port;
+    private int port;
     private int backlog;
     private ServerSocket serverSocket;
     private boolean running = false;
     private int id = 0;
 
     public Server() {
-        do {
-            this.port = Utils.randomGeneratePort(MIN_PORT, MAX_PORT);
-        } while (!Utils.availablePort(this.port));
+        this.port = HOST_PORT;
         this.backlog = 100;
 
         try {

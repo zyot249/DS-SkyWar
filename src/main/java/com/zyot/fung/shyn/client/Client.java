@@ -26,15 +26,10 @@ public class Client implements Runnable{
 
     private boolean isServerDied = false;
 
-    public Client(int port) {
-        try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            this.host = inetAddress.getHostAddress();
-            this.port = port;
-            this.id = -1;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.id = -1;
     }
 
     public void connect() {

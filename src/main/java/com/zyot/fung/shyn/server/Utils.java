@@ -1,18 +1,12 @@
 package com.zyot.fung.shyn.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Random;
+import java.net.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Utils {
-    public static int randomGeneratePort(int min, int max) {
-        Random rand = new Random();
-        return rand.nextInt((max - min) + 1) + min;
-    }
-
     public static String getLocalAddress() {
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -23,17 +17,33 @@ public class Utils {
         }
     }
 
-    public static boolean availablePort(int port) {
+    public static boolean validateIP(String ip) {
+        if (ip == null || ip.isEmpty()) return false;
+        ip = ip.trim();
+        if ((ip.length() < 6) & (ip.length() > 15)) return false;
+
+        try {
+            Pattern pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+            Matcher matcher = pattern.matcher(ip);
+            return matcher.matches();
+        } catch (PatternSyntaxException ex) {
+            return false;
+        }
+    }
+
+    public static boolean availablePort(String host, int port) {
         boolean result = true;
 
         try {
-            (new Socket(getLocalAddress(), port)).close();
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(host, port), 10000);
+            socket.close();
 
             // Successful connection means the port is taken.
             result = false;
         }
         catch(SocketException e) {
-            // Could not connect.
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,7 +51,5 @@ public class Utils {
         return result;
     }
 
-    public static void main(String[] args) {
-        System.out.println(randomGeneratePort(40000, 49998));
-    }
+
 }

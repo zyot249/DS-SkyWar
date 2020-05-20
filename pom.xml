@@ -7,6 +7,7 @@
   <groupId>com.zyot.fung.shyn</groupId>
   <artifactId>FuDuSkyWar</artifactId>
   <version>1.0</version>
+  <packaging>jar</packaging>
 
   <name>FuDuSkyWar</name>
   <!-- FIXME change it to the project's website -->
@@ -62,9 +63,23 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
         </plugin>
+
+
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+            <archive>
+              <!-- Configures the content of the created manifest -->
+              <manifest>
+                <!-- Adds the classpath to the created manifest -->
+                <addClasspath>true</addClasspath>
+                <!-- Specifies that all dependencies of our application are found -->
+                <!-- Configures the main class of the application -->
+                <mainClass>com.zyot.fung.shyn.Test</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -83,6 +98,8 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+
+
       </plugins>
     </pluginManagement>
       <plugins>
@@ -93,6 +110,32 @@
                   <source>8</source>
                   <target>8</target>
               </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.6</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                  </descriptorRefs>
+                  <archive>
+                    <manifest>
+                      <mainClass>
+                        com.zyot.fung.shyn.Test
+                      </mainClass>
+                    </manifest>
+                  </archive>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
       </plugins>
     <resources>
