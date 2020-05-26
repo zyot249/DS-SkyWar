@@ -79,7 +79,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         ImageLoader.init();
         PlaneImageLoader.init();
         HelicopterImageLoader.init();
-        SpaceImageLoader.init();
 //        renderUI();
     }
 
