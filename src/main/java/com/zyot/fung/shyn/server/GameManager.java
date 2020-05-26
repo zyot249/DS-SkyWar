@@ -31,9 +31,10 @@ public class GameManager {
             int distance = (Constants.GAME_WIDTH) / nPlayer;
             int position = i;
             PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
-                    Constants.GAME_HEIGHT + 20,
+                    Constants.GAME_HEIGHT + Constants.INGAME_PADDING_TOP - Constants.PLAYER_HEIGHT,
                     Room.clients.get(i).id,
-                    position);
+                    position,
+                    Room.clients.get(i).playerName);
             playerInGame.init();
             playerInGames.add(playerInGame);
         }
@@ -57,8 +58,8 @@ public class GameManager {
         if (breaks > delay) {
             for (int i = 0; i < 2; i++) {
                 Random rand = new Random();
-                int randX = rand.nextInt(450);
-                int randY = rand.nextInt(450);
+                int randX = rand.nextInt(Constants.INGAME_PADDING_START + Constants.GAME_WIDTH);
+                int randY = rand.nextInt(Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT);
                 enemies.add(new Enemy(randX, -randY));
             }
             current = System.nanoTime();
@@ -74,17 +75,17 @@ public class GameManager {
 
 
     private boolean isCollision(Enemy e, Bullet b) {
-        return e.getX() < b.getX() + 6 &&
-                e.getX() + 25 > b.getX() &&
-                e.getY() < b.getY() + 6 &&
-                e.getY() + 25 > b.getY();
+        return e.getX() < b.getX() + Constants.BULLET_WIDTH &&
+                e.getX() + Constants.ENEMY_WIDTH > b.getX() &&
+                e.getY() < b.getY() + Constants.BULLET_HEIGHT &&
+                e.getY() + Constants.ENEMY_HEIGHT > b.getY();
     }
 
     private boolean isCollision(PlayerInGame p, Enemy e) {
-        return p.getX() < e.getX() + 25 &&
-                p.getX() + 30 > e.getX() &&
-                p.getY() < e.getY() + 25 &&
-                p.getY() + 30 > e.getY();
+        return p.getX() < e.getX() + Constants.ENEMY_WIDTH &&
+                p.getX() + Constants.PLAYER_WIDTH > e.getX() &&
+                p.getY() < e.getY() + Constants.ENEMY_HEIGHT &&
+                p.getY() + Constants.PLAYER_HEIGHT > e.getY();
     }
 
     private void removeObjects() {
@@ -116,7 +117,9 @@ public class GameManager {
                 if (isCollision(e, b)) {
                     enemySet.add(e);
                     bulletSet.add(b);
-                    playerInGames.get(0).incScore(); // TODO calculate score of each player
+                    playerInGames.stream()
+                            .filter(playerInGame -> playerInGame.id == b.getOwnerId())
+                            .findAny().ifPresent(PlayerInGame::incScore);
                 }
             }
         }

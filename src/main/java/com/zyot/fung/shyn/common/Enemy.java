@@ -9,17 +9,20 @@ public class Enemy implements Serializable {
     private int x;
     private int y;
 
+    private int speed;
+
     public Enemy(int x, int y) {
         this.x = x;
         this.y = y;
+        this.speed = 1;
     }
 
     public void tick() {
-        y = y + 1;
+        y = y + speed;
     }
 
     public void render(Graphics g) {
-        g.drawImage(ImageLoader.enemy, x, y, 25, 25, null);
+        g.drawImage(ImageLoader.enemy, x, y, Constants.ENEMY_WIDTH, Constants.ENEMY_HEIGHT, null);
     }
 
     public int getX() {
@@ -28,5 +31,14 @@ public class Enemy implements Serializable {
 
     public int getY() {
         return y;
+    }
+
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 }

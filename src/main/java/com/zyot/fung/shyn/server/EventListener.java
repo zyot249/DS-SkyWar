@@ -125,7 +125,8 @@ public class EventListener {
                     PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
                             Constants.GAME_HEIGHT + 20,
                             Room.clients.get(i).id,
-                            position);
+                            position,
+                            Room.clients.get(i).playerName);
                     playerInGames.add(playerInGame);
                 }
                 for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {

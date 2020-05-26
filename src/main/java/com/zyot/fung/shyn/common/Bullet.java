@@ -9,11 +9,13 @@ public class Bullet implements Serializable {
     private int x;
     private int y;
     private int speed;
+    private int ownerId;
 
-    public Bullet(int x, int y) {
+    public Bullet(int x, int y, int ownerId) {
         this.x = x;
         this.y = y;
         this.speed = 10;
+        this.ownerId = ownerId;
     }
 
     public void tick() {
@@ -21,10 +23,10 @@ public class Bullet implements Serializable {
     }
 
     public void render(Graphics g) {
-        if (y<50) return;
+        if (y < Constants.INGAME_PADDING_TOP) return;
 //        g.setColor(Color.BLUE);
 //        g.fillRect(x, y, 6, 10);
-        g.drawImage(ImageLoader.bullet, x, y, 6, 12, null);
+        g.drawImage(ImageLoader.bullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
     }
 
     public int getX() {
@@ -33,5 +35,9 @@ public class Bullet implements Serializable {
 
     public int getY() {
         return this.y;
+    }
+
+    public int getOwnerId() {
+        return ownerId;
     }
 }

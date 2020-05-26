@@ -10,6 +10,16 @@ public class Constants {
     public static final int IN_GAME_SCREEN_WIDTH = 500;
     public static final int IN_GAME_SCREEN_HEIGHT = 600;
 
+    public static final int INGAME_PADDING_START = (IN_GAME_SCREEN_WIDTH - GAME_WIDTH) / 2 ;
+    public static final int INGAME_PADDING_TOP = (IN_GAME_SCREEN_WIDTH - GAME_WIDTH) / 2;
+
+    public static final int PLAYER_WIDTH = 30;
+    public static final int PLAYER_HEIGHT = 30;
+    public static final int ENEMY_WIDTH = 25;
+    public static final int ENEMY_HEIGHT = 25;
+    public static final int BULLET_WIDTH = 6;
+    public static final int BULLET_HEIGHT = 12;
+
     public static final int WINDOW_WIDTH = 900;
     public static final int WINDOW_HEIGHT = 622;
 
