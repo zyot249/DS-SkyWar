@@ -43,6 +43,10 @@ public class Connection implements Runnable {
             running = true;
 
             while (running) {
+                if (in == null) {
+                    running = false;
+                    break;
+                }
                 try {
                     Object data = in.readObject();
                     listener.received(data, this);
@@ -61,7 +65,7 @@ public class Connection implements Runnable {
 
     public void close() {
         try {
-            if (this.playerName != null) {
+            if (this.playerName != null && in != null && out != null) {
                 if (this.id == 0) {
                     ClosedServerNotificationPacket closedServerNotificationPacket = new ClosedServerNotificationPacket("Room Master was out!");
                     for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
@@ -85,10 +89,10 @@ public class Connection implements Runnable {
                         }
                     }
                 }
+                in.close();
+                out.close();
             }
             running = false;
-            in.close();
-            out.close();
             socket.close();
             ConnectionHandler.connections.remove(this.id);
         } catch (IOException e) {

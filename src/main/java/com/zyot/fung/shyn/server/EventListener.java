@@ -60,6 +60,15 @@ public class EventListener {
     }
 
     private void handleAddConnectionRequestPacket(AddConnectionRequestPacket packet, Connection connection) {
+        if (Room.isInGame) {
+            AddConnectionResponsePacket addConnectionResponsePacket = new AddConnectionResponsePacket(
+                    -1,
+                    false,
+                    "Room is started!");
+
+            connection.sendObject(addConnectionResponsePacket);
+            connection.close();
+        }
         if (ConnectionHandler.connections.size() <= MAX_ROOM_SIZE) {
 
             packet.id = connection.id;
@@ -125,7 +134,8 @@ public class EventListener {
                     PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
                             Constants.GAME_HEIGHT + 20,
                             Room.clients.get(i).id,
-                            position);
+                            position,
+                            Room.clients.get(i).playerName);
                     playerInGames.add(playerInGame);
                 }
                 for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {

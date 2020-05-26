@@ -21,8 +21,6 @@ public class ImageLoader {
 
     public static BufferedImage loadImage(String path) {
         try {
-            System.out.println(path);
-            System.out.println( ImageLoader.class.getResource(ImageLoader.class.getSimpleName() + ".class") );
             return ImageIO.read(ImageLoader.class.getResource(path));
         } catch (IOException e) {
             e.printStackTrace();

@@ -94,7 +94,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         g.clearRect(0,0,Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT);
 
         // draw
-        g.drawImage(SpaceImageLoader.getPlaneFrame(), 50 ,50, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
+        g.drawImage(ImageLoader.image, Constants.INGAME_PADDING_START ,Constants.INGAME_PADDING_TOP, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
         renderObjects(g);
         // end of draw
 
@@ -104,7 +104,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
 
     private void renderObjects(Graphics g) {
         for (Enemy e : enemies) {
-            if (e.getX() >= 50 && e.getX() <= 450 - 25 && e.getY() <= 450 - 25 && e.getY() >= 50) {
+            if (e.getX() >= Constants.INGAME_PADDING_START && e.getX() <= (Constants.INGAME_PADDING_START + Constants.GAME_WIDTH - Constants.ENEMY_WIDTH) && e.getY() <= (Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT - Constants.ENEMY_WIDTH) && e.getY() >= Constants.INGAME_PADDING_TOP) {
                 e.render(g);
             }
         }
@@ -118,12 +118,22 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         }
 
         g.setColor(Color.BLUE);
-        g.drawString(getPlayersScore(), 70, 500);
+        g.drawString(getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
     }
 
     private String getPlayersScore() {
-        int totalScore = playerInGames.stream().mapToInt(PlayerInGame::getScore).sum();
-        return String.format("Total score: %d", totalScore);
+//        int totalScore = playerInGames.stream().mapToInt(PlayerInGame::getScore).sum();
+//        return String.format("Total score: %d", totalScore);
+
+        StringBuilder sb = new StringBuilder();
+        playerInGames.forEach(player -> {
+            sb.append(player.getName())
+                .append(" : ")
+                .append(player.getScore())
+                .append("\n");
+
+        });
+        return sb.toString();
     }
 
     @Subscribe

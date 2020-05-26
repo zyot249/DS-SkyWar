@@ -4,11 +4,21 @@ public class Constants {
     public static final int HOST_PORT = 46666;
     public static final int MAX_ROOM_SIZE = 4;
 
-    public static final int GAME_WIDTH = 400;
-    public static final int GAME_HEIGHT = 400;
+    public static final int GAME_WIDTH = 900;
+    public static final int GAME_HEIGHT = 600;
 
-    public static final int IN_GAME_SCREEN_WIDTH = 500;
+    public static final int IN_GAME_SCREEN_WIDTH = 900;
     public static final int IN_GAME_SCREEN_HEIGHT = 600;
+
+    public static final int INGAME_PADDING_START = (IN_GAME_SCREEN_WIDTH - GAME_WIDTH) / 2 ;
+    public static final int INGAME_PADDING_TOP = (IN_GAME_SCREEN_HEIGHT - GAME_HEIGHT) / 2;
+
+    public static final int PLAYER_WIDTH = 50;
+    public static final int PLAYER_HEIGHT = 50;
+    public static final int ENEMY_WIDTH = 50;
+    public static final int ENEMY_HEIGHT = 50;
+    public static final int BULLET_WIDTH = 6;
+    public static final int BULLET_HEIGHT = 12;
 
     public static final int WINDOW_WIDTH = 900;
     public static final int WINDOW_HEIGHT = 622;

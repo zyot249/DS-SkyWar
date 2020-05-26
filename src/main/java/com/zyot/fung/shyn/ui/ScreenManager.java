@@ -1,6 +1,7 @@
 package com.zyot.fung.shyn.ui;
 
 import com.zyot.fung.shyn.common.Constants;
+import com.zyot.fung.shyn.server.Room;
 import com.zyot.fung.shyn.ui.screens.HomeScreen;
 import com.zyot.fung.shyn.ui.screens.IngameScreen;
 import com.zyot.fung.shyn.ui.screens.RoomScreen;
@@ -82,6 +83,7 @@ public class ScreenManager {
             window.repaint();
         } else if (screenName.equals(INGAME_SCREEN)) {
             openNewScreen(getIngameScreen(args));
+            Room.isInGame = true;
         }
     }
 
