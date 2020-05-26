@@ -1,7 +1,9 @@
 package com.zyot.fung.shyn.common;
 
 import com.zyot.fung.shyn.server.GameManager;
+import com.zyot.fung.shyn.ui.HelicopterImageLoader;
 import com.zyot.fung.shyn.ui.ImageLoader;
+import com.zyot.fung.shyn.ui.PlaneImageLoader;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -59,7 +61,7 @@ public class PlayerInGame implements Serializable {
     public void render(Graphics g) {
         if (health > 0) {
             if (isMe()) {
-                g.drawImage(ImageLoader.myPlane, x, y, 30, 30, null);
+                g.drawImage(HelicopterImageLoader.getPlaneFrame(), x, y, 50, 50, null);
             } else {
                 g.drawImage(ImageLoader.player, x, y, 30, 30, null);
             }

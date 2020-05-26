@@ -8,8 +8,7 @@ import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
 import com.zyot.fung.shyn.packet.PlayerIngameActionPacket;
 import com.zyot.fung.shyn.packet.StartGameResponsePacket;
 import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
-import com.zyot.fung.shyn.ui.ImageLoader;
-import com.zyot.fung.shyn.ui.ScreenManager;
+import com.zyot.fung.shyn.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,6 +77,9 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         canvas.setVisible(true);
 
         ImageLoader.init();
+        PlaneImageLoader.init();
+        HelicopterImageLoader.init();
+        SpaceImageLoader.init();
 //        renderUI();
     }
 
@@ -92,7 +94,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         g.clearRect(0,0,Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT);
 
         // draw
-        g.drawImage(ImageLoader.image, 50 ,50, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
+        g.drawImage(SpaceImageLoader.getPlaneFrame(), 50 ,50, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
         renderObjects(g);
         // end of draw
 
