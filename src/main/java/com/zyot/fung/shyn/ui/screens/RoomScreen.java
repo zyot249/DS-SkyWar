@@ -227,6 +227,7 @@ public class RoomScreen extends JPanel implements ActionListener {
     }
 
     private void exitRoom() {
+        room.doBeforeClose();
         room.shutdown();
     }
 
@@ -260,5 +261,13 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     private void exitScreen() {
         EventBuz.getInstance().unregister(this);
+    }
+
+    public void resetReadyStatus() {
+        if (player.getId() != 0) {  // room master always has id = 0
+            player.notifyReadyState(false);
+        } else {
+            player.notifyReadyState(true);
+        }
     }
 }

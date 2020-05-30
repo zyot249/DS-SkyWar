@@ -46,10 +46,7 @@ public class ScreenManager {
 
     public void navigate(String screenName, HashMap<String, Object> args) {
         if (screenName.equals(HOME_SCREEN)) {
-            window.getContentPane().removeAll();
-            window.getContentPane().add(getHomeScreen());
-            window.revalidate();
-            window.repaint();
+            openNewScreen(getHomeScreen());
         } else if (screenName.equals(NEW_ROOM_SCREEN)) {
             String playerName;
             Boolean isRoomMaster = false;
@@ -72,15 +69,9 @@ public class ScreenManager {
                 playerName = "PlayerNameDefault";
             }
 
-            window.getContentPane().removeAll();
-            window.getContentPane().add(getNewRoomScreen(playerName, isRoomMaster, ip));
-            window.revalidate();
-            window.repaint();
+            openNewScreen(getNewRoomScreen(playerName, isRoomMaster, ip));
         } else if (screenName.equals(EXISTED_ROOM_SCREEN)) {
-            window.getContentPane().removeAll();
-            window.getContentPane().add(getRoomScreen());
-            window.revalidate();
-            window.repaint();
+            openNewScreen(getRoomScreen());
         } else if (screenName.equals(INGAME_SCREEN)) {
             openNewScreen(getIngameScreen(args));
             Room.isInGame = true;
@@ -108,6 +99,8 @@ public class ScreenManager {
     private synchronized RoomScreen getRoomScreen() {
         if (roomScreen == null) {
             roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, null);
+        } else {
+            roomScreen.resetReadyStatus();
         }
         return roomScreen;
     }

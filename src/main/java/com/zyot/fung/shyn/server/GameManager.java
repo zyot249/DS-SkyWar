@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class GameManager {
     private int nPlayer;
+    public ArrayList<PlayerInGame> players;
     public ArrayList<PlayerInGame> playerInGames;
     public static ArrayList<Bullet> bullets;
+    public static ArrayList<Bullet> enemyBullets;
     public static ArrayList<Enemy> enemies;
 
     private long current;
@@ -26,6 +29,7 @@ public class GameManager {
     }
 
     public void init() {
+        players = new ArrayList<>();
         playerInGames = new ArrayList<>();
         for (int i=0; i<nPlayer; i++) {
             int distance = (Constants.GAME_WIDTH) / nPlayer;
@@ -36,10 +40,12 @@ public class GameManager {
                     position,
                     Room.clients.get(i).playerName);
             playerInGame.init();
+            players.add(playerInGame);
             playerInGames.add(playerInGame);
         }
 
         bullets = new ArrayList<>();
+        enemyBullets = new ArrayList<>();
         enemies = new ArrayList<>();
 
         current = System.nanoTime();
@@ -53,12 +59,16 @@ public class GameManager {
         for (Bullet bullet : bullets) {
             bullet.tick();
         }
+        for (Bullet bullet : enemyBullets) {
+            bullet.tick();
+        }
 
         long breaks = (System.nanoTime() - current)/1000000;
         if (breaks > delay) {
             for (int i = 0; i < 2; i++) {
                 Random rand = new Random();
-                int randX = rand.nextInt(Constants.INGAME_PADDING_START + Constants.GAME_WIDTH);
+//                int randX = rand.nextInt(Constants.INGAME_PADDING_START + Constants.GAME_WIDTH);
+                int randX = ThreadLocalRandom.current().nextInt(Constants.INGAME_PADDING_START, Constants.INGAME_PADDING_START + Constants.GAME_WIDTH - Constants.ENEMY_WIDTH);
                 int randY = rand.nextInt(Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT);
                 enemies.add(new Enemy(randX, -randY));
             }
@@ -88,12 +98,21 @@ public class GameManager {
                 p.getY() + Constants.PLAYER_HEIGHT > e.getY();
     }
 
+    private boolean isCollision(PlayerInGame p, Bullet enemyBullet) {
+        return p.getX() < enemyBullet.getX() + Constants.BULLET_WIDTH &&
+                p.getX() + Constants.PLAYER_WIDTH > enemyBullet.getX() &&
+                p.getY() < enemyBullet.getY() + Constants.BULLET_HEIGHT &&
+                p.getY() + Constants.PLAYER_HEIGHT > enemyBullet.getY();
+    }
+
     private void removeObjects() {
-        bullets = bullets.stream().filter(bullet -> bullet.getY() > Constants.INGAME_PADDING_TOP).collect(Collectors.toCollection(ArrayList::new));
+        bullets = bullets.stream().filter(bullet -> bullet.getY() > Constants.INGAME_PADDING_TOP && bullet.getY() < Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT).collect(Collectors.toCollection(ArrayList::new));
+        enemyBullets = enemyBullets.stream().filter(bullet -> bullet.getY() > Constants.INGAME_PADDING_TOP && bullet.getY() < Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT).collect(Collectors.toCollection(ArrayList::new));
 
         Set<PlayerInGame> playerInGameSet = new HashSet<>();
         Set<Enemy> enemySet = new HashSet<>();
         Set<Bullet> bulletSet = new HashSet<>();
+        Set<Bullet> enemyBulletSet = new HashSet<>();
 
         for (Enemy e :enemies) {
             for (PlayerInGame playerInGame : playerInGames) {
@@ -109,6 +128,7 @@ public class GameManager {
             }
 
             playerInGames.removeAll(playerInGameSet);
+            playerInGameSet.clear();
             if (playerInGames.isEmpty()) {
                break;
             }
@@ -124,13 +144,30 @@ public class GameManager {
             }
         }
 
+        for (Bullet eBullet: enemyBullets) {
+            for (PlayerInGame playerInGame : playerInGames) {
+                if (isCollision(playerInGame, eBullet)) {
+                    enemyBulletSet.add(eBullet);
+                    playerInGame.setHealth(playerInGame.getHealth() - 1);
+                    System.out.println("P" + playerInGame.getPosition() + " : " + playerInGame.getHealth());
+                    if (playerInGame.getHealth() <= 0) {
+                        System.out.println("P" + playerInGame.getPosition() + " : " + "Died");
+                        playerInGameSet.add(playerInGame);
+                    }
+                }
+            }
+        }
+
+
         if (playerInGames.isEmpty()) {
 //            enemies.clear();
             System.out.println("Loss");
         }
 
+        playerInGames.removeAll(playerInGameSet);
         enemies.removeAll(enemySet);
         bullets.removeAll(bulletSet);
+        enemyBullets.removeAll(enemyBulletSet);
 
     }
 
@@ -139,9 +176,11 @@ public class GameManager {
         this.playerInGames.removeIf(player -> player.id == event.playerId);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        EventBuz.getInstance().unregister(this);
-        super.finalize();
+    public void doBeforeClose() {
+        try {
+            EventBuz.getInstance().unregister(this);
+        } catch (Exception e) {
+
+        }
     }
 }

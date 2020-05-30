@@ -30,6 +30,9 @@ public class EventListener {
         } else if (p instanceof NotReadyWarningPacket) {
             NotReadyWarningPacket packet = (NotReadyWarningPacket) p;
             handleNotReadyWarningPacket(packet);
+        } else if (p instanceof GameOverPacket) {
+            GameOverPacket packet = (GameOverPacket) p;
+            handleGameOverPacket(packet);
         }
     }
 
@@ -81,6 +84,10 @@ public class EventListener {
     }
 
     private void handleStartGameResponsePacket(StartGameResponsePacket packet) {
+        EventBuz.getInstance().post(packet);
+    }
+
+    private void handleGameOverPacket(GameOverPacket packet) {
         EventBuz.getInstance().post(packet);
     }
 

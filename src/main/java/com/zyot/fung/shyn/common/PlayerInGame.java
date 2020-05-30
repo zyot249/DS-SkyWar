@@ -17,6 +17,8 @@ public class PlayerInGame implements Serializable {
     public boolean fire;
     public boolean right;
     public boolean left;
+    public boolean up;
+    public boolean down;
 
     private long current;
     private long delay;
@@ -55,6 +57,16 @@ public class PlayerInGame implements Serializable {
             if (right) {
                 if (x <= Constants.INGAME_PADDING_START + Constants.GAME_WIDTH - Constants.PLAYER_WIDTH) {
                     x = x + speed;
+                }
+            }
+            if (up) {
+                if (y > Constants.INGAME_PADDING_TOP) {
+                    y = y - speed;
+                }
+            }
+            if (down) {
+                if (y < Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT - Constants.PLAYER_WIDTH) {
+                    y = y + speed;
                 }
             }
             if (fire) {

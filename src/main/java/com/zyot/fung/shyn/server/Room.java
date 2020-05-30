@@ -44,10 +44,15 @@ public class Room extends Server{
         game.handlePlayerAction(event);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        EventBuz.getInstance().unregister(this);
+    public void doBeforeClose() {
+        try {
+            EventBuz.getInstance().unregister(this);
+            if (game != null) {
+                game.doBeforeClose();
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     public static boolean isAllClientsReady() {

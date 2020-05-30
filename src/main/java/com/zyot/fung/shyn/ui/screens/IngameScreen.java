@@ -4,11 +4,9 @@ import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
 import com.zyot.fung.shyn.common.*;
-import com.zyot.fung.shyn.packet.ClosedServerNotificationPacket;
-import com.zyot.fung.shyn.packet.PlayerIngameActionPacket;
-import com.zyot.fung.shyn.packet.StartGameResponsePacket;
-import com.zyot.fung.shyn.packet.UpdateIngameInfoPacket;
+import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.ui.*;
+import org.checkerframework.checker.units.qual.A;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,14 +15,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.zyot.fung.shyn.common.Constants.HOME_SCREEN;
 
 public class IngameScreen extends JPanel implements ActionListener, KeyListener {
     private ArrayList<PlayerInGame> playerInGames;
     private ArrayList<Bullet> bullets;
+    private ArrayList<Bullet> enemyBullets;
     private ArrayList<Enemy> enemies;
 
     public static Canvas canvas;
@@ -61,6 +61,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     private void initObjectList() {
         playerInGames = new ArrayList<>();
         bullets = new ArrayList<>();
+        enemyBullets = new ArrayList<>();
         enemies = new ArrayList<>();
     }
 
@@ -116,8 +117,19 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
             bullet.render(g);
         }
 
+        for (Bullet bullet : enemyBullets) {
+            bullet.render(g);
+        }
+
         g.setColor(Color.BLUE);
-        g.drawString(getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
+//        g.drawString(getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
+        drawPlayerScores(g, getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
+    }
+
+    private void drawPlayerScores(Graphics g, String scoreStr, int x, int y) {
+        int lineHeight = 20;
+        for (String line : scoreStr.split("\n"))
+            g.drawString(line, x, y += lineHeight);
     }
 
     private String getPlayersScore() {
@@ -146,12 +158,35 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
 
         this.playerInGames.clear();
         this.bullets.clear();
+        this.enemyBullets.clear();
         this.enemies.clear();
 
         this.playerInGames.addAll(event.playerInGames);
         this.bullets.addAll(event.bullets);
+        this.enemyBullets.addAll(event.enemyBullets);
         this.enemies.addAll(event.enemies);
         renderUI();
+    }
+
+    @Subscribe
+    public void onGameOverEvent(GameOverPacket event) {
+        event.playerInGames.sort((player1, player2) -> player2.getScore() - player1.getScore());    // sort in Descending order
+        List<JComponent> playerScores = event.playerInGames.stream()
+                .map(this::getItemPlayerScore)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        String header = "<html><span style='font-size:20px'>"+String.format("%-25s :    %7s", "Player","Score")+"</span></html>";
+        playerScores.add(0, new JLabel(header));
+
+        JFrame jFrameParent = ScreenManager.getInstance().getWindow();
+        System.out.println(jFrameParent);
+        GameOverDialog gameOverDialog = new GameOverDialog(jFrameParent, playerScores, this::backToLobby);
+        gameOverDialog.showDialog();
+    }
+
+    private JComponent getItemPlayerScore(PlayerInGame player) {
+        String result = "<html><span style='font-size:20px'>"+String.format("%-25s :    %7d", player.getName(), player.getScore())+"</span></html>";
+        return new JLabel(result);
     }
 
     @Subscribe
@@ -159,12 +194,19 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         backToHome();
     }
 
-    private void backToHome() {
-//        exitScreen();
-        ScreenManager.getInstance().navigate(HOME_SCREEN);
+    private void backToLobby() {
+        doBeforeClose();
+        ScreenManager.getInstance().navigate(Constants.EXISTED_ROOM_SCREEN);
     }
 
-    private void exitScreen() {
+    private void backToHome() {
+        doBeforeClose();
+        ScreenManager.getInstance().navigate(HOME_SCREEN);
+        System.gc();
+    }
+
+    private void doBeforeClose() {
+        ScreenManager.getInstance().getWindow().removeKeyListener(this);
         EventBuz.getInstance().unregister(this);
     }
 
@@ -185,6 +227,10 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.LEFT_PRESSED));
         } else if (keycode == KeyEvent.VK_RIGHT) {
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.RIGHT_PRESSED));
+        } else if (keycode == KeyEvent.VK_UP) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.UP_PRESSED));
+        } else if (keycode == KeyEvent.VK_DOWN) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.DOWN_PRESSED));
         }
     }
 
@@ -200,13 +246,11 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.LEFT_RELEASED));
         } else if (keycode == KeyEvent.VK_RIGHT) {
             player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.RIGHT_RELEASED));
+        } else if (keycode == KeyEvent.VK_UP) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.UP_RELEASED));
+        } else if (keycode == KeyEvent.VK_DOWN) {
+            player.sendObject(new PlayerIngameActionPacket(PlayerIngameActionPacket.Action.DOWN_RELEASED));
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        ScreenManager.getInstance().getWindow().removeKeyListener(this);
-        EventBuz.getInstance().unregister(this);
-        super.finalize();
-    }
 }

@@ -11,6 +11,10 @@ public class Bullet implements Serializable {
     private int speed;
     private int ownerId;
 
+    public Bullet(int x, int y) {
+       this(x, y, -1);
+    }
+
     public Bullet(int x, int y, int ownerId) {
         this.x = x;
         this.y = y;
@@ -19,14 +23,23 @@ public class Bullet implements Serializable {
     }
 
     public void tick() {
-        y = y - speed;
+        if (belongToEnemy()) {
+            y = y + speed;
+        } else {
+            y = y - speed;
+        }
     }
 
     public void render(Graphics g) {
-        if (y < Constants.INGAME_PADDING_TOP) return;
+        if (y < Constants.INGAME_PADDING_TOP || y > Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT) return;
 //        g.setColor(Color.BLUE);
 //        g.fillRect(x, y, 6, 10);
-        g.drawImage(ImageLoader.bullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
+        if (!belongToEnemy()) {
+            g.drawImage(ImageLoader.bullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
+        } else {
+            g.setColor(Color.RED);
+            g.fillRect(x, y, 6, 10);
+        }
     }
 
     public int getX() {
@@ -39,5 +52,9 @@ public class Bullet implements Serializable {
 
     public int getOwnerId() {
         return ownerId;
+    }
+
+    private boolean belongToEnemy() {
+        return ownerId == -1;
     }
 }
