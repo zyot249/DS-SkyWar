@@ -97,4 +97,8 @@ public class PlayerHolder extends JPanel {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public void setPlaneType(int planeType) {
+        this.planeSelector.setSelectedIndex(planeType);
+    }
 }

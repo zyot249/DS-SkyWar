@@ -173,10 +173,11 @@ public class RoomScreen extends JPanel implements ActionListener {
                     holder.setPlayerName(client.playerName);
                     if (client.playerName.equals(this.playerName)) {
                         holder.setFocusPlayer(true);
+                        holder.setPlayer(player);
                     } else {
+                        holder.setPlaneType(client.planeType);
                         holder.setFocusPlayer(false);
                     }
-                    holder.setPlayer(player);
                     holder.setReadyIcon(client.isReady);
                     holder.setImage(client.planeType);
                 }
@@ -187,6 +188,7 @@ public class RoomScreen extends JPanel implements ActionListener {
                 holder.setImage(-1);
                 holder.setReadyIcon(false);
                 holder.setFocusPlayer(false);
+                holder.setPlaneType(0);
             }
         }
     }
