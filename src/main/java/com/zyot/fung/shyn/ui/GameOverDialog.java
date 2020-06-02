@@ -95,9 +95,6 @@ public class GameOverDialog extends JDialog {
 				okButton.setFocusable(false);
 				okButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
 				okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-				okButton.setBorderPainted(false);
-				okButton.setBackground(Color.GREEN);
-				okButton.setForeground(Color.WHITE);
 				okButton.setActionCommand("OK");
 
 				okButton.addActionListener( actionEvent -> {

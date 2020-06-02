@@ -37,8 +37,7 @@ public class Bullet implements Serializable {
         if (!belongToEnemy()) {
             g.drawImage(ImageLoader.bullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
         } else {
-            g.setColor(Color.RED);
-            g.fillRect(x, y, 6, 10);
+            g.drawImage(ImageLoader.enemyBullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
         }
     }
 

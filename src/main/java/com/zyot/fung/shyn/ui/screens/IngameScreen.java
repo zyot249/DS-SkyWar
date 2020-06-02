@@ -78,6 +78,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         canvas.setVisible(true);
 
         ImageLoader.init();
+        SpaceImageLoader.init();
         PlaneImageLoader.init();
         HelicopterImageLoader.init();
 //        renderUI();
@@ -94,7 +95,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         g.clearRect(0,0,Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT);
 
         // draw
-        g.drawImage(ImageLoader.image, Constants.INGAME_PADDING_START ,Constants.INGAME_PADDING_TOP, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
+        g.drawImage(SpaceImageLoader.getPlaneFrame(), Constants.INGAME_PADDING_START ,Constants.INGAME_PADDING_TOP, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
         renderObjects(g);
         // end of draw
 

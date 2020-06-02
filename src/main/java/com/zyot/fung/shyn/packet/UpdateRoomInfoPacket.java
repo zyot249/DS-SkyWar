@@ -14,9 +14,8 @@ public class UpdateRoomInfoPacket implements Serializable {
     public UpdateRoomInfoPacket() {
     }
 
-    public UpdateRoomInfoPacket(ArrayList<ClientInRoom> clients, int level) {
+    public UpdateRoomInfoPacket(ArrayList<ClientInRoom> clients) {
         this.clients = new ArrayList<>();
         this.clients.addAll(clients);
-        this.level = level;
     }
 }

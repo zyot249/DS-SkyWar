@@ -1,42 +1,22 @@
 package com.zyot.fung.shyn.ui;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class SpaceImageLoader {
-    private static final int NUM_OF_SAME_FRAME = 4;
-    public static ArrayList<BufferedImage> frames;
-
-    private static int curFrame;
-    private static int count;
+    private static BufferedImage space;
+    private static final int FRAME_WIDTH = 485;
+    private static final int FRAME_HEIGHT = 322;
+    private static int currentY;
 
     public static void init() {
-        frames = new ArrayList<>(102);
-        for (int i = 1; i <= 102; i++) {
-            if (i < 10) {
-                frames.add(i - 1, ImageLoader.loadImage("/space1/ezgif-frame-00" + i + ".jpg"));
-            } else if (i < 100) {
-                frames.add(i - 1, ImageLoader.loadImage("/space1/ezgif-frame-0" + i + ".jpg"));
-            } else {
-                frames.add(i - 1, ImageLoader.loadImage("/space1/ezgif-frame-" + i + ".jpg"));
-            }
-        }
-        curFrame = 0;
-        count = 1;
+        space = ImageLoader.loadImage("/spaceplane.png").getSubimage(0, 0, 485, 1170);
+        currentY = 1170 - FRAME_HEIGHT;
     }
 
     public static BufferedImage getPlaneFrame() {
-        BufferedImage frame = frames.get(curFrame);
-        if (count < NUM_OF_SAME_FRAME) {
-            count++;
-        } else if (count == NUM_OF_SAME_FRAME) {
-            if (curFrame == 101) {
-                curFrame = 0;
-            } else {
-                curFrame++;
-            }
-            count = 1;
+        if (currentY <= 0) {
+            currentY = 1170 - FRAME_HEIGHT;
         }
-        return frame;
+        return space.getSubimage(0, currentY--, FRAME_WIDTH, FRAME_HEIGHT);
     }
 }

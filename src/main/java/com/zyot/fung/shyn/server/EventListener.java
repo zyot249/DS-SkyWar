@@ -29,19 +29,6 @@ public class EventListener {
             PlayerIngameActionPacket packet = (PlayerIngameActionPacket) p;
             packet.playerId = connection.id;
             handlePlayerIngameActionPacket(packet);
-        } else if (p instanceof ChangeGameLevelPacket) {
-            ChangeGameLevelPacket changeGameLevelPacket = (ChangeGameLevelPacket) p;
-            handleChangeGameLevelPacket(changeGameLevelPacket, connection);
-        }
-    }
-
-    private void handleChangeGameLevelPacket(ChangeGameLevelPacket packet, Connection connection) {
-        Room.setLevel(packet.level);
-        UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
-
-        for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-            Connection c = entry.getValue();
-            c.sendObject(updateRoomInfoPacket);
         }
     }
 
@@ -51,7 +38,7 @@ public class EventListener {
                 if (clientInRoom.id == connection.id)
                     clientInRoom.isReady = packet.isReady;
             });
-            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
             for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                 Connection c = entry.getValue();
                 c.sendObject(updateRoomInfoPacket);
@@ -80,7 +67,7 @@ public class EventListener {
                     isReady,
                     packet.isMaster);
             Room.clients.add(client);
-            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
 
             for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                 Connection c = entry.getValue();
