@@ -1,17 +1,18 @@
 package com.zyot.fung.shyn.common;
 
 import com.zyot.fung.shyn.server.GameManager;
-import com.zyot.fung.shyn.ui.HelicopterImageLoader;
-import com.zyot.fung.shyn.ui.ImageLoader;
-import com.zyot.fung.shyn.ui.PlaneImageLoader;
+import com.zyot.fung.shyn.ui.imagehandler.PlaneLoader;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 public class PlayerInGame implements Serializable {
     private int position;
     public int id;
     private String name;
+    public int planeType;
+
     private int x;
     private int y;
     public boolean fire;
@@ -28,15 +29,16 @@ public class PlayerInGame implements Serializable {
     private int speed = 4;
 
     public PlayerInGame(int x, int y, int id, int position) {
-        this(x,y,id,position,"Player Unknown");
+        this(x,y,id,position,"Player Unknown", 0);
     }
 
-    public PlayerInGame(int x, int y, int id, int position, String playerName) {
+    public PlayerInGame(int x, int y, int id, int position, String playerName, int planeType) {
         this.id = id;
         this.position = position;
         this.x = x;
         this.y = y;
         this.name = playerName;
+        this.planeType = planeType;
     }
 
 
@@ -79,13 +81,14 @@ public class PlayerInGame implements Serializable {
         }
     }
 
-    public void render(Graphics g) {
+    public void render(Graphics g, BufferedImage frame) {
         if (health > 0) {
-            if (isMe()) {
-                g.drawImage(HelicopterImageLoader.getPlaneFrame(), x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
-            } else {
-                g.drawImage(ImageLoader.player, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
-            }
+//            if (isMe()) {
+//                g.drawImage(, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
+//            } else {
+//                g.drawImage(ImageLoader.player, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
+//            }
+            g.drawImage(frame, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
         }
     }
 

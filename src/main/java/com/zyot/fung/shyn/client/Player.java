@@ -18,8 +18,8 @@ public class Player extends Client {
         super.sendObject(readyRequestPacket);
     }
 
-    public void sendStartGameRequest(int level) {
-        StartGameRequestPacket startGameRequestPacket = new StartGameRequestPacket(level);
+    public void sendStartGameRequest() {
+        StartGameRequestPacket startGameRequestPacket = new StartGameRequestPacket();
         sendObject(startGameRequestPacket);
     }
 }

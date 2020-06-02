@@ -38,7 +38,8 @@ public class GameManager {
                     Constants.GAME_HEIGHT + Constants.INGAME_PADDING_TOP - Constants.PLAYER_HEIGHT,
                     Room.clients.get(i).id,
                     position,
-                    Room.clients.get(i).playerName);
+                    Room.clients.get(i).playerName,
+                    Room.clients.get(i).planeType);
             playerInGame.init();
             players.add(playerInGame);
             playerInGames.add(playerInGame);

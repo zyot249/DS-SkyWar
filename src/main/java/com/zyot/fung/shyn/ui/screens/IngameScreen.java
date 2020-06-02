@@ -3,10 +3,17 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
-import com.zyot.fung.shyn.common.*;
+import com.zyot.fung.shyn.common.Bullet;
+import com.zyot.fung.shyn.common.Constants;
+import com.zyot.fung.shyn.common.Enemy;
+import com.zyot.fung.shyn.common.PlayerInGame;
 import com.zyot.fung.shyn.packet.*;
-import com.zyot.fung.shyn.ui.*;
-import org.checkerframework.checker.units.qual.A;
+import com.zyot.fung.shyn.server.Room;
+import com.zyot.fung.shyn.ui.GameOverDialog;
+import com.zyot.fung.shyn.ui.ScreenManager;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
+import com.zyot.fung.shyn.ui.imagehandler.PlaneLoader;
+import com.zyot.fung.shyn.ui.imagehandler.SpaceImageLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +34,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     private ArrayList<Bullet> bullets;
     private ArrayList<Bullet> enemyBullets;
     private ArrayList<Enemy> enemies;
+    private ArrayList<PlaneLoader> planeLoaders;
 
     public static Canvas canvas;
     private BufferStrategy buffer;
@@ -51,6 +60,14 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
 
         ScreenManager.getInstance().getWindow().addKeyListener(this);
         ScreenManager.getInstance().getWindow().setFocusable(true);
+        if (args != null && args.containsKey("playerInGames")) {
+            ArrayList<PlayerInGame> players = (ArrayList<PlayerInGame>) args.get("playerInGames");
+            this.playerInGames.addAll(players);
+
+            players.forEach(playerInGame -> {
+                planeLoaders.add(new PlaneLoader(playerInGame.planeType));
+            });
+        }
     }
 
 //    private void initPlayer(String host) {
@@ -63,6 +80,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         bullets = new ArrayList<>();
         enemyBullets = new ArrayList<>();
         enemies = new ArrayList<>();
+        planeLoaders = new ArrayList<>();
     }
 
     @Override
@@ -78,8 +96,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         canvas.setVisible(true);
 
         ImageLoader.init();
-        PlaneImageLoader.init();
-        HelicopterImageLoader.init();
 //        renderUI();
     }
 
@@ -94,7 +110,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         g.clearRect(0,0,Constants.IN_GAME_SCREEN_WIDTH, Constants.IN_GAME_SCREEN_HEIGHT);
 
         // draw
-        g.drawImage(ImageLoader.image, Constants.INGAME_PADDING_START ,Constants.INGAME_PADDING_TOP, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
+        g.drawImage(SpaceImageLoader.getPlaneFrame(), Constants.INGAME_PADDING_START ,Constants.INGAME_PADDING_TOP, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, null);
         renderObjects(g);
         // end of draw
 
@@ -109,8 +125,9 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
             }
         }
 
-        for (PlayerInGame player : playerInGames) {
-            player.render(g);
+        for (int i = 0; i < playerInGames.size(); i++) {
+            playerInGames.get(i).render(g,
+                    planeLoaders.get(i).getPlaneFrame());
         }
 
         for (Bullet bullet : bullets) {
@@ -147,10 +164,14 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         return sb.toString();
     }
 
-    @Subscribe
-    public void onGameStartEvent(StartGameResponsePacket startGameResponsePacket) {
-        renderCanvas();
-    }
+//    @Subscribe
+//    public void onGameStartEvent(StartGameResponsePacket startGameResponsePacket) {
+//        System.out.println("IngameScreen | onGameStartEvent");
+//        startGameResponsePacket.playerInGames.forEach(playerInGame -> {
+//            planeLoaders.add(new PlaneLoader(playerInGame.planeType));
+//        });
+//        renderCanvas();
+//    }
 
     @Subscribe
     public void onUpdateIngameInfoEvent(UpdateIngameInfoPacket event) {
@@ -165,6 +186,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         this.bullets.addAll(event.bullets);
         this.enemyBullets.addAll(event.enemyBullets);
         this.enemies.addAll(event.enemies);
+
         renderUI();
     }
 

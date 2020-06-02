@@ -1,4 +1,4 @@
-package com.zyot.fung.shyn.ui;
+package com.zyot.fung.shyn.ui.imagehandler;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

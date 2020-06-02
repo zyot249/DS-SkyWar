@@ -1,7 +1,7 @@
 package com.zyot.fung.shyn.common;
 
 import com.zyot.fung.shyn.server.GameManager;
-import com.zyot.fung.shyn.ui.ImageLoader;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
 import java.awt.*;
 import java.io.Serializable;

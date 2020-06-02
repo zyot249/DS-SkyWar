@@ -78,7 +78,7 @@ public class Connection implements Runnable {
                     EventBuz.getInstance().post(new PlayerLeftEvent(this.id));
 
                     Room.clients.removeIf(clientInRoom -> clientInRoom.id == this.id);
-                    UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+                    UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
 
                     for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                         Connection c = entry.getValue();

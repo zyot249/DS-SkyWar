@@ -1,6 +1,6 @@
 package com.zyot.fung.shyn.common;
 
-import com.zyot.fung.shyn.ui.ImageLoader;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -35,10 +35,9 @@ public class Bullet implements Serializable {
 //        g.setColor(Color.BLUE);
 //        g.fillRect(x, y, 6, 10);
         if (!belongToEnemy()) {
-            g.drawImage(ImageLoader.bullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
+            g.drawImage(ImageLoader.playerBullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
         } else {
-            g.setColor(Color.RED);
-            g.fillRect(x, y, 6, 10);
+            g.drawImage(ImageLoader.enemyBullet, x, y, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT, null);
         }
     }
 
