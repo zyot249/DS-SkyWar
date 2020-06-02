@@ -3,6 +3,7 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
+import com.zyot.fung.shyn.common.PlayerInGame;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
@@ -33,8 +34,6 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     private Player player;
     public String playerName;
-
-
 
     public RoomScreen(int width, int height, HashMap<String, Object> args) {
         setSize(width, height);
@@ -150,7 +149,7 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     @Subscribe
     public void onStartGameEvent(StartGameResponsePacket startGameEvent) {
-        startGame();
+        startGame(startGameEvent.playerInGames);
     }
 
     @Subscribe
@@ -177,13 +176,15 @@ public class RoomScreen extends JPanel implements ActionListener {
                     } else {
                         holder.setFocusPlayer(false);
                     }
+                    holder.setPlayer(player);
                     holder.setReadyIcon(client.isReady);
-                    holder.setImage(true);
+                    holder.setImage(client.planeType);
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
+                holder.setPlayer(null);
                 holder.setPlayerName("No Player");
-                holder.setImage(false);
+                holder.setImage(-1);
                 holder.setReadyIcon(false);
                 holder.setFocusPlayer(false);
             }
@@ -211,14 +212,15 @@ public class RoomScreen extends JPanel implements ActionListener {
         if (e.getSource() == exitBtn) {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
-            player.sendStartGameRequest(1);
+            player.sendStartGameRequest();
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }
     }
 
-    private void startGame() {
+    private void startGame(ArrayList<PlayerInGame> playerInGames) {
         HashMap<String, Object> args = new HashMap<>();
+        args.put("playerInGames", playerInGames);
         args.put("player", player);
         ScreenManager.getInstance().navigate(INGAME_SCREEN, args);
     }
