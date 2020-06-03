@@ -1,7 +1,9 @@
 package com.zyot.fung.shyn.ui.screens;
 
+import com.zyot.fung.shyn.common.Constants;
 import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.ScreenManager;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -107,5 +109,11 @@ public class HomeScreen extends JPanel implements ActionListener{
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN, args);
         }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(ImageLoader.loadImage("/background3.jpg"), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
     }
 }
