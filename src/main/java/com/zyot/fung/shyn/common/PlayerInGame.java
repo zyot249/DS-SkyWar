@@ -1,7 +1,7 @@
 package com.zyot.fung.shyn.common;
 
 import com.zyot.fung.shyn.server.GameManager;
-import com.zyot.fung.shyn.ui.imagehandler.PlaneLoader;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -89,6 +89,7 @@ public class PlayerInGame implements Serializable {
 //                g.drawImage(ImageLoader.player, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
 //            }
             g.drawImage(frame, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
+            g.drawImage(ImageLoader.loadImage("/arrow_up.png"), x + 23, y + 55, 5, 5, null);
         }
     }
 
