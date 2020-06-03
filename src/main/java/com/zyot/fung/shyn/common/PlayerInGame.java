@@ -83,13 +83,9 @@ public class PlayerInGame implements Serializable {
 
     public void render(Graphics g, BufferedImage frame) {
         if (health > 0) {
-//            if (isMe()) {
-//                g.drawImage(, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
-//            } else {
-//                g.drawImage(ImageLoader.player, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
-//            }
             g.drawImage(frame, x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, null);
-            g.drawImage(ImageLoader.loadImage("/arrow_up.png"), x + 23, y + 55, 5, 5, null);
+            if (isMe())
+                g.drawImage(ImageLoader.loadImage("/arrow_up.png"), x + 23, y + 55, 5, 5, null);
         }
     }
 
