@@ -10,6 +10,7 @@ import com.zyot.fung.shyn.server.Room;
 import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.PlayerHolder;
 import com.zyot.fung.shyn.ui.ScreenManager;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,6 +71,7 @@ public class RoomScreen extends JPanel implements ActionListener {
         startGameBtn.addActionListener(this);
 
         roomIDLb = new JLabel("Room ID: " + this.host);
+        roomIDLb.setForeground(Color.WHITE);
         roomIDLb.setBounds(600, 10, 300, 25);
 
         add(roomIDLb);
@@ -237,5 +239,11 @@ public class RoomScreen extends JPanel implements ActionListener {
         } else {
             player.notifyReadyState(true);
         }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(ImageLoader.loadImage("/background4.jpg"), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
     }
 }
