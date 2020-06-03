@@ -3,10 +3,7 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
-import com.zyot.fung.shyn.common.Bullet;
-import com.zyot.fung.shyn.common.Constants;
-import com.zyot.fung.shyn.common.Enemy;
-import com.zyot.fung.shyn.common.PlayerInGame;
+import com.zyot.fung.shyn.common.*;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.Room;
 import com.zyot.fung.shyn.ui.GameOverDialog;
@@ -21,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +94,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         canvas.setVisible(true);
 
         ImageLoader.init();
-//        renderUI();
     }
 
     private void renderUI() {
@@ -119,6 +116,17 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     }
 
     private void renderObjects(Graphics g) {
+        for (PlayerInGame p : playerInGames) {
+            if (p.id == AppPreferences.UID) {
+                int width = 20;
+                int height = 20;
+                for (int j = 0; j < p.getHealth(); j++) {
+                    g.drawImage(ImageLoader.heart, Constants.INGAME_PADDING_START + 20 + j * (width + 10), Constants.INGAME_PADDING_TOP + 20, width, height, null);
+                }
+            }
+
+        }
+
         for (Enemy e : enemies) {
             if (e.getX() >= Constants.INGAME_PADDING_START && e.getX() <= (Constants.INGAME_PADDING_START + Constants.GAME_WIDTH - Constants.ENEMY_WIDTH) && e.getY() <= (Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT - Constants.ENEMY_WIDTH) && e.getY() >= Constants.INGAME_PADDING_TOP) {
                 e.render(g);
@@ -139,7 +147,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         }
 
         g.setColor(Color.BLUE);
-//        g.drawString(getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
         drawPlayerScores(g, getPlayersScore(), Constants.GAME_WIDTH - 200, Constants.INGAME_PADDING_TOP + 10);
     }
 
@@ -150,8 +157,6 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     }
 
     private String getPlayersScore() {
-//        int totalScore = playerInGames.stream().mapToInt(PlayerInGame::getScore).sum();
-//        return String.format("Total score: %d", totalScore);
 
         StringBuilder sb = new StringBuilder();
         playerInGames.forEach(player -> {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class ImageLoader {
     public static BufferedImage entities;
+    public static BufferedImage heart;
     public static BufferedImage enemy, player, myPlane;
     public static BufferedImage playerBullet, enemyBullet;
     public static ArrayList<BufferedImage> framesOfPlane1;
@@ -16,6 +17,7 @@ public class ImageLoader {
     public static void init() {
         SpaceImageLoader.init();
         entities = loadImage("/airplane.png");
+        heart = loadImage("/heart.png");
         enemy = loadImage("/airplane.png").getSubimage(0, 0,85, 90);
         player = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
         myPlane = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
