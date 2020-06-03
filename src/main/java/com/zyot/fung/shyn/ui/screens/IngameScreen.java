@@ -15,6 +15,9 @@ import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 import com.zyot.fung.shyn.ui.imagehandler.PlaneLoader;
 import com.zyot.fung.shyn.ui.imagehandler.SpaceImageLoader;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,8 +44,10 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     private Graphics g;
 
     private Player player;
+    private Clip clip;
 
     public IngameScreen(int width, int height, HashMap<String, Object> args) {
+        initSounds();
         if (args != null && args.containsKey("player")) {
             player = (Player) args.get("player");
         } else {
@@ -164,6 +169,18 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         return sb.toString();
     }
 
+    private void initSounds() {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(IngameScreen.class.getResource("/sounds/bgsound1.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch(Exception ex) {
+            System.out.println("Error with playing sound.");
+            ex.printStackTrace();
+        }
+    }
 //    @Subscribe
 //    public void onGameStartEvent(StartGameResponsePacket startGameResponsePacket) {
 //        System.out.println("IngameScreen | onGameStartEvent");
@@ -219,6 +236,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
     private void backToLobby() {
         doBeforeClose();
         ScreenManager.getInstance().navigate(Constants.EXISTED_ROOM_SCREEN);
+        clip.stop();
     }
 
     private void backToHome() {

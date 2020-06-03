@@ -12,6 +12,9 @@ import com.zyot.fung.shyn.ui.PlayerHolder;
 import com.zyot.fung.shyn.ui.ScreenManager;
 import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -32,6 +35,7 @@ public class RoomScreen extends JPanel implements ActionListener {
     private int[] playerHolderLocations = {20, 240, 460, 680};
     private Room room;
     private String host;
+    public Clip clip;
 
     private Player player;
     public String playerName;
@@ -61,6 +65,20 @@ public class RoomScreen extends JPanel implements ActionListener {
                 this.playerName = args.get("playerName").toString();
                 initPlayer(isMaster, this.host);
             }
+        }
+        initSounds();
+    }
+
+    private void initSounds() {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(RoomScreen.class.getResource("/sounds/bgsound2.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch(Exception ex) {
+            System.out.println("Error with playing sound.");
+            ex.printStackTrace();
         }
     }
 
@@ -227,6 +245,7 @@ public class RoomScreen extends JPanel implements ActionListener {
         args.put("playerInGames", playerInGames);
         args.put("player", player);
         ScreenManager.getInstance().navigate(INGAME_SCREEN, args);
+        clip.stop();
     }
 
     private void exitScreen() {

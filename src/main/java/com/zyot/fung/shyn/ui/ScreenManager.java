@@ -6,6 +6,7 @@ import com.zyot.fung.shyn.ui.screens.HomeScreen;
 import com.zyot.fung.shyn.ui.screens.IngameScreen;
 import com.zyot.fung.shyn.ui.screens.RoomScreen;
 
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 import java.util.HashMap;
@@ -101,6 +102,8 @@ public class ScreenManager {
             roomScreen = new RoomScreen(SCREEN_WIDTH, SCREEN_HEIGHT, null);
         } else {
             roomScreen.resetReadyStatus();
+            roomScreen.clip.loop(Clip.LOOP_CONTINUOUSLY);
+            roomScreen.clip.start();
         }
         return roomScreen;
     }

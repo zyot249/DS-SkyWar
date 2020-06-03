@@ -1,10 +1,12 @@
 package com.zyot.fung.shyn.ui.screens;
 
-import com.zyot.fung.shyn.common.Constants;
 import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.ScreenManager;
 import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,7 +15,7 @@ import java.util.HashMap;
 
 import static com.zyot.fung.shyn.common.Constants.*;
 
-public class HomeScreen extends JPanel implements ActionListener{
+public class HomeScreen extends JPanel implements ActionListener {
 
     private ScreenManager screenManager;
 
@@ -21,6 +23,8 @@ public class HomeScreen extends JPanel implements ActionListener{
     private JButton joinGameBtn;
     private JButton quitGameBtn;
     private JLabel titleLb;
+    private Clip clip;
+
 
     public HomeScreen(int width, int height) {
         setSize(width, height);
@@ -30,6 +34,7 @@ public class HomeScreen extends JPanel implements ActionListener{
     }
 
     private void initUI() {
+        initSounds();
         createGameBtn = new JButton("Create Game");
         joinGameBtn = new JButton("Join Game");
         quitGameBtn = new JButton("Quit");
@@ -54,6 +59,19 @@ public class HomeScreen extends JPanel implements ActionListener{
         add(joinGameBtn);
         add(quitGameBtn);
         add(titleLb);
+    }
+
+    private void initSounds() {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(HomeScreen.class.getResource("/sounds/bgsound2.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch(Exception ex) {
+            System.out.println("Error with playing sound.");
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -108,6 +126,7 @@ public class HomeScreen extends JPanel implements ActionListener{
             if (screenManager == null)
                 screenManager = ScreenManager.getInstance();
             screenManager.navigate(NEW_ROOM_SCREEN, args);
+            clip.stop();
         }
     }
 

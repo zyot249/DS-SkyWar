@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImageLoader {
-    public static BufferedImage entities;
-    public static BufferedImage enemy, player, myPlane;
+    public static BufferedImage enemy, player;
     public static BufferedImage playerBullet, enemyBullet;
     public static ArrayList<BufferedImage> framesOfPlane1;
     public static ArrayList<BufferedImage> framesOfPlane2;
@@ -15,10 +14,7 @@ public class ImageLoader {
 
     public static void init() {
         SpaceImageLoader.init();
-//        entities = loadImage("/airplane.png");
         enemy = loadImage("/airplane.png").getSubimage(0, 0,85, 90);
-//        player = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
-//        myPlane = loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
         playerBullet = loadImage("/bullet4.png").getSubimage(500, 0, 280, 1280);
         enemyBullet = loadImage("/bullet5-reverse.png").getSubimage(165, 40, 107, 295);
 
