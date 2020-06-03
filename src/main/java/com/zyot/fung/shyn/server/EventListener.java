@@ -29,19 +29,23 @@ public class EventListener {
             PlayerIngameActionPacket packet = (PlayerIngameActionPacket) p;
             packet.playerId = connection.id;
             handlePlayerIngameActionPacket(packet);
-        } else if (p instanceof ChangeGameLevelPacket) {
-            ChangeGameLevelPacket changeGameLevelPacket = (ChangeGameLevelPacket) p;
-            handleChangeGameLevelPacket(changeGameLevelPacket, connection);
+        } else if (p instanceof ChangePlaneTypeRequestPacket) {
+            ChangePlaneTypeRequestPacket packet = (ChangePlaneTypeRequestPacket) p;
+            handleChangePlaneTypeRequest(packet, connection);
         }
     }
 
-    private void handleChangeGameLevelPacket(ChangeGameLevelPacket packet, Connection connection) {
-        Room.setLevel(packet.level);
-        UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
-
-        for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
-            Connection c = entry.getValue();
-            c.sendObject(updateRoomInfoPacket);
+    private void handleChangePlaneTypeRequest(ChangePlaneTypeRequestPacket packet, Connection connection) {
+        if (connection.id == packet.id) {
+            Room.clients.forEach(clientInRoom -> {
+                if (clientInRoom.id == connection.id)
+                    clientInRoom.planeType = packet.planeType;
+            });
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
+            for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
+                Connection c = entry.getValue();
+                c.sendObject(updateRoomInfoPacket);
+            }
         }
     }
 
@@ -51,7 +55,7 @@ public class EventListener {
                 if (clientInRoom.id == connection.id)
                     clientInRoom.isReady = packet.isReady;
             });
-            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
             for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                 Connection c = entry.getValue();
                 c.sendObject(updateRoomInfoPacket);
@@ -60,6 +64,15 @@ public class EventListener {
     }
 
     private void handleAddConnectionRequestPacket(AddConnectionRequestPacket packet, Connection connection) {
+        if (Room.isInGame) {
+            AddConnectionResponsePacket addConnectionResponsePacket = new AddConnectionResponsePacket(
+                    -1,
+                    false,
+                    "Room is started!");
+
+            connection.sendObject(addConnectionResponsePacket);
+            connection.close();
+        }
         if (ConnectionHandler.connections.size() <= MAX_ROOM_SIZE) {
 
             packet.id = connection.id;
@@ -69,9 +82,10 @@ public class EventListener {
             ClientInRoom client = new ClientInRoom(packet.id,
                     packet.playerName,
                     isReady,
-                    packet.isMaster);
+                    packet.isMaster,
+                    0);
             Room.clients.add(client);
-            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients, Room.getLevel());
+            UpdateRoomInfoPacket updateRoomInfoPacket = new UpdateRoomInfoPacket(Room.clients);
 
             for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                 Connection c = entry.getValue();
@@ -117,6 +131,7 @@ public class EventListener {
                 }
             } else {
                 System.out.println("Server - EventLister - Start Game");
+                System.out.println("SERVER - EventListener - Connections: " + ConnectionHandler.connections.size());
                 ArrayList<PlayerInGame> playerInGames = new ArrayList<>();
                 int nPlayers = Room.clients.size();
                 for (int i=0; i<nPlayers; i++) {
@@ -125,12 +140,15 @@ public class EventListener {
                     PlayerInGame playerInGame = new PlayerInGame(33 + distance / 2 + (position*distance),
                             Constants.GAME_HEIGHT + 20,
                             Room.clients.get(i).id,
-                            position);
+                            position,
+                            Room.clients.get(i).playerName,
+                            Room.clients.get(i).planeType);
                     playerInGames.add(playerInGame);
                 }
+                StartGameResponsePacket startGameResponsePacket = new StartGameResponsePacket(playerInGames);
                 for(Map.Entry<Integer, Connection> entry : ConnectionHandler.connections.entrySet()) {
                     Connection c = entry.getValue();
-                    c.sendObject(new StartGameResponsePacket(playerInGames));
+                    c.sendObject(startGameResponsePacket);
                 }
 
                 EventBuz.getInstance().post(new InitGameSetupEvent());

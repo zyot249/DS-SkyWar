@@ -8,15 +8,17 @@ public class ClientInRoom implements Serializable {
     public int id;
     public String playerName;
     public boolean isReady;
+    public int planeType;
     public boolean isMaster;
 
     public ClientInRoom() {
     }
 
-    public ClientInRoom(int id, String playerName, boolean isReady, boolean isMaster) {
+    public ClientInRoom(int id, String playerName, boolean isReady, boolean isMaster, int planeType) {
         this.id = id;
         this.playerName = playerName;
         this.isReady = isReady;
         this.isMaster = isMaster;
+        this.planeType = planeType;
     }
 }

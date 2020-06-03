@@ -8,6 +8,10 @@ public class PlayerIngameActionPacket implements Serializable {
         RIGHT_PRESSED,
         FIRE_PRESSED,
         LEFT_RELEASED,
+        UP_PRESSED,
+        UP_RELEASED,
+        DOWN_PRESSED,
+        DOWN_RELEASED,
         RIGHT_RELEASED,
         FIRE_RELEASED
     }

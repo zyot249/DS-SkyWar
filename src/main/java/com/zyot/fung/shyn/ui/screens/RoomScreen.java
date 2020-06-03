@@ -3,21 +3,24 @@ package com.zyot.fung.shyn.ui.screens;
 import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.client.Player;
+import com.zyot.fung.shyn.common.PlayerInGame;
 import com.zyot.fung.shyn.packet.*;
 import com.zyot.fung.shyn.server.ClientInRoom;
 import com.zyot.fung.shyn.server.Room;
 import com.zyot.fung.shyn.server.Utils;
 import com.zyot.fung.shyn.ui.PlayerHolder;
 import com.zyot.fung.shyn.ui.ScreenManager;
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 
 import static com.zyot.fung.shyn.common.Constants.*;
 
@@ -30,23 +33,14 @@ public class RoomScreen extends JPanel implements ActionListener {
     private JLabel roomIDLb;
     private ArrayList<PlayerHolder> playerHolders;
     private int[] playerHolderLocations = {20, 240, 460, 680};
-    private JComboBox levelSelector;
-
-    private Vector<String> levels;
     private Room room;
     private String host;
+    public Clip clip;
 
     private Player player;
     public String playerName;
 
-
-
     public RoomScreen(int width, int height, HashMap<String, Object> args) {
-        levels = new Vector<>();
-        levels.add("Easy");
-        levels.add("Medium");
-        levels.add("Hard");
-        levels.add("Super");
         setSize(width, height);
         setLayout(null);
         initUI();
@@ -72,6 +66,20 @@ public class RoomScreen extends JPanel implements ActionListener {
                 initPlayer(isMaster, this.host);
             }
         }
+        initSounds();
+    }
+
+    private void initSounds() {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(RoomScreen.class.getResource("/sounds/bgsound2.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch(Exception ex) {
+            System.out.println("Error with playing sound.");
+            ex.printStackTrace();
+        }
     }
 
     private void renderUIofMaster() {
@@ -81,10 +89,8 @@ public class RoomScreen extends JPanel implements ActionListener {
         startGameBtn.addActionListener(this);
 
         roomIDLb = new JLabel("Room ID: " + this.host);
-        roomIDLb.setBounds(430, 10, 300, 25);
-
-
-        levelSelector.setEnabled(true);
+        roomIDLb.setForeground(Color.WHITE);
+        roomIDLb.setBounds(600, 10, 300, 25);
 
         add(roomIDLb);
         add(startGameBtn);
@@ -119,18 +125,6 @@ public class RoomScreen extends JPanel implements ActionListener {
             add(playerHolders.get(i));
         }
 
-        levelSelector = new JComboBox(levels);
-        levelSelector.setBounds(730, 10, 150, 25);
-        levelSelector.setSelectedIndex(0);
-        levelSelector.setEditable(false);
-        levelSelector.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                String levelName = e.getItem().toString();
-                requestChangeGameLevel(levelName);
-            }
-        });
-        levelSelector.setEnabled(false);
-
         exitBtn.setBounds(20, 10, 110, 25);
         exitBtn.setFont(new Font(NORMAL_FONT, Font.PLAIN, 14));
         readyBtn.setBounds(660, 540, 220, 50);
@@ -140,7 +134,6 @@ public class RoomScreen extends JPanel implements ActionListener {
         exitBtn.addActionListener(this);
         readyBtn.addActionListener(this);
 
-        add(levelSelector);
         add(exitBtn);
         add(readyBtn);
         add(separator);
@@ -166,7 +159,6 @@ public class RoomScreen extends JPanel implements ActionListener {
     @Subscribe
     public void onUpdateRoomInfoEvent(UpdateRoomInfoPacket updateRoomInfoPacket) {
         renderPlayerList(updateRoomInfoPacket.clients);
-        renderGameLevel(updateRoomInfoPacket.level);
     }
 
     @Subscribe
@@ -177,12 +169,7 @@ public class RoomScreen extends JPanel implements ActionListener {
 
     @Subscribe
     public void onStartGameEvent(StartGameResponsePacket startGameEvent) {
-        startGame();
-    }
-
-    private void requestChangeGameLevel(String levelName) {
-        ChangeGameLevelPacket packet = new ChangeGameLevelPacket(levels.indexOf(levelName));
-        player.sendObject(packet);
+        startGame(startGameEvent.playerInGames);
     }
 
     @Subscribe
@@ -206,27 +193,28 @@ public class RoomScreen extends JPanel implements ActionListener {
                     holder.setPlayerName(client.playerName);
                     if (client.playerName.equals(this.playerName)) {
                         holder.setFocusPlayer(true);
+                        holder.setPlayer(player);
                     } else {
+                        holder.setPlaneType(client.planeType);
                         holder.setFocusPlayer(false);
                     }
                     holder.setReadyIcon(client.isReady);
-                    holder.setImage(true);
+                    holder.setImage(client.planeType);
                 }
             } else {
                 PlayerHolder holder = playerHolders.get(i);
+                holder.setPlayer(null);
                 holder.setPlayerName("No Player");
-                holder.setImage(false);
+                holder.setImage(-1);
                 holder.setReadyIcon(false);
                 holder.setFocusPlayer(false);
+                holder.setPlaneType(0);
             }
         }
     }
 
-    private void renderGameLevel(int level) {
-        levelSelector.setSelectedIndex(level);
-    }
-
     private void exitRoom() {
+        room.doBeforeClose();
         room.shutdown();
     }
 
@@ -246,19 +234,35 @@ public class RoomScreen extends JPanel implements ActionListener {
         if (e.getSource() == exitBtn) {
             backToHome();
         } else if (e.getSource() == startGameBtn) {
-            player.sendStartGameRequest(1);
+            player.sendStartGameRequest();
         } else if (e.getSource() == readyBtn) {
             player.notifyReadyState(!player.isReady);
         }
     }
 
-    private void startGame() {
+    private void startGame(ArrayList<PlayerInGame> playerInGames) {
         HashMap<String, Object> args = new HashMap<>();
+        args.put("playerInGames", playerInGames);
         args.put("player", player);
         ScreenManager.getInstance().navigate(INGAME_SCREEN, args);
+        clip.stop();
     }
 
     private void exitScreen() {
         EventBuz.getInstance().unregister(this);
+    }
+
+    public void resetReadyStatus() {
+        if (player.getId() != 0) {  // room master always has id = 0
+            player.notifyReadyState(false);
+        } else {
+            player.notifyReadyState(true);
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(ImageLoader.loadImage("/background4.jpg"), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
     }
 }

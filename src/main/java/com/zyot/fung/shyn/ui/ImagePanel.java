@@ -1,5 +1,7 @@
 package com.zyot.fung.shyn.ui;
 
+import com.zyot.fung.shyn.ui.imagehandler.ImageLoader;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,11 +13,17 @@ public class ImagePanel extends JPanel {
         image = ImageLoader.loadImage("/noplayerimage.png");
     }
 
-    public void setImage(boolean isExistPlayer) {
-        if (isExistPlayer) {
-            image = ImageLoader.loadImage("/plane2.png").getSubimage(5, 10, 290, 240);
-        } else {
+    public void setImage(int planeType) {
+        if (planeType == -1) {
             image = ImageLoader.loadImage("/noplayerimage.png");
+        } else if (planeType == 0) {
+            image = ImageLoader.loadImage("/plane1/frame_apngframe1.png").getSubimage(40, 50, 217, 200);
+        } else if (planeType == 1) {
+            image = ImageLoader.loadImage("/plane2/plane2-1.png").getSubimage(5, 10, 290, 240);
+        } else if (planeType == 2) {
+            image = ImageLoader.loadImage("/helicopter/heli-f1.png").getSubimage(21, 21, 160, 160);
+        } else {
+            image = ImageLoader.loadImage("/plane1/frame_apngframe1.png").getSubimage(40, 50, 217, 200);
         }
         repaint();
     }
