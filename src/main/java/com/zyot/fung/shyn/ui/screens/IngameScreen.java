@@ -105,7 +105,7 @@ public class IngameScreen extends JPanel implements ActionListener, KeyListener 
         buffer = canvas.getBufferStrategy();
         if (buffer == null) {
             canvas.createBufferStrategy(3);
-            System.out.println("buffer is NULL");
+//            System.out.println("buffer is NULL");
             return;
         }
         g = buffer.getDrawGraphics();

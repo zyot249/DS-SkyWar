@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import com.zyot.fung.shyn.client.EventBuz;
 import com.zyot.fung.shyn.common.*;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -20,8 +19,13 @@ public class GameManager {
     public static ArrayList<Bullet> enemyBullets;
     public static ArrayList<Enemy> enemies;
 
-    private long current;
-    private long delay;
+    private long timeLastEnemyCreated;
+    private long delay; // in Millisecond
+
+    private int currentLevel;
+    private long currentLevelStartTime;
+    private long secondsForEachLevel;
+
     public GameManager(int numberOfPlayers) {
         this.nPlayer = numberOfPlayers;
 
@@ -49,8 +53,11 @@ public class GameManager {
         enemyBullets = new ArrayList<>();
         enemies = new ArrayList<>();
 
-        current = System.nanoTime();
-        delay = 800;
+        timeLastEnemyCreated = System.nanoTime();
+        currentLevel = 1;
+        currentLevelStartTime = timeLastEnemyCreated;
+        delay = 2000;
+        secondsForEachLevel = 10;
     }
 
     public void tick() {
@@ -63,17 +70,21 @@ public class GameManager {
         for (Bullet bullet : enemyBullets) {
             bullet.tick();
         }
-
-        long breaks = (System.nanoTime() - current)/1000000;
+        long now = System.nanoTime();
+        if ((currentLevel < 8 ) && (((now - currentLevelStartTime)/1000000000) > secondsForEachLevel)) {
+            currentLevel++;
+            currentLevelStartTime = now;
+            System.out.println("current level: " + currentLevel);
+        }
+        long breaks = (now - timeLastEnemyCreated)/1000000;
         if (breaks > delay) {
             for (int i = 0; i < 2; i++) {
                 Random rand = new Random();
-//                int randX = rand.nextInt(Constants.INGAME_PADDING_START + Constants.GAME_WIDTH);
                 int randX = ThreadLocalRandom.current().nextInt(Constants.INGAME_PADDING_START, Constants.INGAME_PADDING_START + Constants.GAME_WIDTH - Constants.ENEMY_WIDTH);
-                int randY = rand.nextInt(Constants.INGAME_PADDING_TOP + Constants.GAME_HEIGHT);
-                enemies.add(new Enemy(randX, -randY));
+                int randY = rand.nextInt(Constants.GAME_HEIGHT / 4);
+                enemies.add(new Enemy(randX, -randY, currentLevel));
             }
-            current = System.nanoTime();
+            timeLastEnemyCreated = System.nanoTime();
         }
 
         for (int i = 0; i < enemies.size(); i++) {
@@ -160,10 +171,10 @@ public class GameManager {
         }
 
 
-        if (playerInGames.isEmpty()) {
+//        if (playerInGames.isEmpty()) {
 //            enemies.clear();
-            System.out.println("Loss");
-        }
+//            System.out.println("Loss");
+//        }
 
         playerInGames.removeAll(playerInGameSet);
         enemies.removeAll(enemySet);

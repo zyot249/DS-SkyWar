@@ -16,9 +16,13 @@ public class Enemy implements Serializable {
     private long current;
 
     public Enemy(int x, int y) {
+        this(x, y, 1);
+    }
+
+    public Enemy(int x, int y, int speed) {
         this.x = x;
         this.y = y;
-        this.speed = 1;
+        this.speed = speed;
         this.delay = 1000;
         this.current = System.nanoTime();
     }
@@ -28,7 +32,7 @@ public class Enemy implements Serializable {
 
         long breaks = (System.nanoTime() - current) / 1000000;
         int random = new Random().nextInt(100);
-        if (breaks > delay && random >= 90) {
+        if (breaks > delay && random >= 95) {
             GameManager.enemyBullets.add(new Bullet(x + (Constants.ENEMY_WIDTH-Constants.BULLET_WIDTH)/2, y + 10));
             current = System.nanoTime();
         }
